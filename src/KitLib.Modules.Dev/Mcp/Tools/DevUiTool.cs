@@ -190,16 +190,47 @@ internal sealed class DevUiTool : IMcpTool {
             return found;
 
         var needle = filter.Trim();
-        var matched = new List<Control>();
+        var matched = new List<(Control Control, int Rank)>();
         foreach (var control in found) {
-            if (Contains(Label(control), needle)
-                || Contains(control.Name.ToString(), needle)
-                || Contains(control.GetType().Name, needle)) {
-                matched.Add(control);
-            }
+            var rank = MatchRank(control, needle);
+            if (rank >= 0)
+                matched.Add((control, rank));
         }
-        return matched;
+
+        // Best match FIRST, so index 0 is the obvious one. Plain substring order is a trap: filtering
+        // for "Relics" during an event matched a Neow option whose body text mentions relics before it
+        // matched the rail button captioned exactly "Relics" -- and clicking index 0 took the blessing
+        // instead of opening the browser. A wrong click here changes the run, so the ordering has to
+        // put an exact caption ahead of prose that merely contains the word.
+        return matched
+            .OrderBy(m => m.Rank)
+            .Select(m => m.Control)
+            .ToList();
     }
+
+    /// <summary>Lower is a better match; -1 means no match at all.</summary>
+    static int MatchRank(Control control, string needle) {
+        var label = Label(control);
+        var name = control.Name.ToString();
+        var type = control.GetType().Name;
+
+        if (Equals(label, needle)) return 0;
+        if (Equals(name, needle)) return 1;
+        if (Equals(type, needle)) return 2;
+        if (StartsWith(label, needle)) return 3;
+        if (StartsWith(name, needle)) return 4;
+        if (Contains(label, needle)) return 5;
+        if (Contains(name, needle)) return 6;
+        if (Contains(type, needle)) return 7;
+        return -1;
+    }
+
+    static bool Equals(string value, string needle) =>
+        string.Equals(value, needle, System.StringComparison.OrdinalIgnoreCase);
+
+    static bool StartsWith(string value, string needle) =>
+        !string.IsNullOrEmpty(value)
+        && value.StartsWith(needle, System.StringComparison.OrdinalIgnoreCase);
 
     static void Walk(Node node, List<Control> found) {
         // Hidden subtrees are not clickable for a human either, and a menu that is merely stacked
