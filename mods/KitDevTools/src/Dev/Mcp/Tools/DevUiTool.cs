@@ -271,6 +271,12 @@ internal sealed class DevUiTool : IMcpTool {
         if (!string.IsNullOrWhiteSpace(fromChildren))
             return fromChildren;
 
+        // Icon-only controls carry their meaning in the tooltip and nowhere else. The Dev rail is 18
+        // such buttons, so without this the panels are reachable only by blind index -- you cannot ask
+        // for "Cards" or "Cheats", just guess a number and see what opens.
+        if (!string.IsNullOrWhiteSpace(control.TooltipText))
+            return control.TooltipText;
+
         // A row like HBox[CheckBox, Label] is the dominant shape in KitLib's own panels, and there the
         // caption is a SIBLING, not a child. Without this a settings page lists dozens of controls with
         // empty labels -- which is only navigable by blind index, so the tool is useless exactly where
