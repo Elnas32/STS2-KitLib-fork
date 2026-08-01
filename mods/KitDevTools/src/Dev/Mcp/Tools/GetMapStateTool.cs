@@ -50,6 +50,13 @@ internal sealed class GetMapStateTool : IMcpTool {
         if (map == null || points == null || points.Count == 0)
             return new JsonObject { ["error"] = "No map for the current act." };
 
+        // GetAllMapPoints() walks the GRID, and the act's entry node is not in it -- ActMap keeps it as
+        // StartingMapPoint. Leave it out and the very first "where can I go from here" lookup fails,
+        // because the only visited coord matches nothing.
+        var start = map.StartingMapPoint;
+        if (start != null && !points.Any(p => p.coord.Equals(start.coord)))
+            points.Insert(0, start);
+
         var visited = state.VisitedMapCoords ?? [];
         var visitedSet = new HashSet<MapCoord>(visited);
         var reachable = new HashSet<MapCoord>(NextReachable(state, points).Select(p => p.coord));
