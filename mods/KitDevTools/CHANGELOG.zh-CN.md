@@ -20,6 +20,7 @@
 - **MCP `get_map_state`** — 用于路线规划的完整本章地图：每个节点的 row/col、类型与子节点（边），以及已走路径、当前位置、下一步可达节点与 Boss。地图界面关闭时同样可用。
 - **MCP `dev_ui`** — 按 index 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框），无需鼠标即可驱动菜单与对话框。也可驱动 mod 添加的、本身并非按钮而是自行处理 `gui_input` 的控件——行、面板拖柄、底栏控件等；并提供 `focus` 动作，用于那些按 Godot `FocusEntered` 而非按下来响应的界面，选角色界面正是靠它才变得可驱动。
 - **MCP `dev_read_text`** — 读取当前屏幕上的可见文本（标签、提示、面板、预测）并去除 BBCode，令 agent 能读出预览与提示的实际内容。
+- **MCP `dev_add_potion`** — 按 model id 给本地玩家授予药水，相当于 `dev_add_card` / `dev_add_relic` 的药水版。传 `search` 可在无对局时列出 id。
 
 ### Changed
 

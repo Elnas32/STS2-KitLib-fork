@@ -52,6 +52,7 @@ internal static class McpBridge {
         Tools.Register(new GetMapStateTool());
         Tools.Register(new DevUiTool());
         Tools.Register(new DevReadTextTool());
+        Tools.Register(new DevAddPotionTool());
         Tools.Register(new DevListMonstersTool());
         Tools.Register(new DevDumpMonsterMechanicsTool());
         Tools.Register(new DevListEnemiesTool());
