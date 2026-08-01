@@ -268,4 +268,21 @@ internal sealed class Sts2McpTools {
             args["lock"] = @lock.Value;
         return _bridge.CallToolAsync("dev_set_stat", args, cancellationToken);
     }
+
+    [McpServerTool(Name = "dev_jump_floor"), Description(
+        "Jump a run forward by ACTS (the game's own act transition) and/or FLOORS (synthetic — pads the "
+        + "floor counter without playing rooms, for testing floor-gated behaviour like act-3 relic gates).")]
+    public Task<string> DevJumpFloor(
+        [Description("Target act INDEX (0-based). Must be at or ahead of the current act.")]
+        int? act = null,
+        [Description("Target TotalFloor. Synthetic: enters no rooms and draws no RNG.")]
+        int? floor = null,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject();
+        if (act.HasValue)
+            args["act"] = act.Value;
+        if (floor.HasValue)
+            args["floor"] = floor.Value;
+        return _bridge.CallToolAsync("dev_jump_floor", args, cancellationToken);
+    }
 }
