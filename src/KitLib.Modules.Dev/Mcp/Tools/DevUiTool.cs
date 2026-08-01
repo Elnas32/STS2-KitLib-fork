@@ -30,9 +30,10 @@ internal sealed class DevUiTool : IMcpTool {
     public string Name => "dev_ui";
 
     public string Description =>
-        "List and drive on-screen UI controls (buttons, checkboxes, dropdowns, text fields) by index: "
-        + "action 'list' to see what is on screen, then 'click', 'toggle', 'select' or 'set_text'. "
-        + "Use this to open menus and fill dialogs -- dev_hover only covers hover-only game surfaces.";
+        "List and drive on-screen UI controls (buttons, checkboxes, dropdowns, text fields, and mod-added "
+        + "controls that handle their own gui_input) by index: action 'list' to see what is on screen, then "
+        + "'click', 'toggle', 'select' or 'set_text'. Use this to open menus and fill dialogs -- dev_hover "
+        + "only covers hover-only game surfaces.";
 
     public string InputSchemaJson => """
     {
@@ -122,10 +123,44 @@ internal sealed class DevUiTool : IMcpTool {
                 break;
 
             default:
-                return DevCardMcpHelper.Fail($"{control.GetType().Name} is not clickable.");
+                if (!PressViaGuiInput(control))
+                    return DevCardMcpHelper.Fail($"{control.GetType().Name} is not clickable.");
+
+                break;
         }
 
         return Ok(control, index, "clicked");
+    }
+
+    /// <summary>
+    /// Presses a Control that handles its own mouse events, by feeding it the same event the engine would.
+    /// </summary>
+    /// <remarks>
+    /// Godot delivers a click to a <c>MouseFilter.Stop</c> Control as an <c>InputEventMouseButton</c> on
+    /// <c>gui_input</c>, so emitting one IS the click — handlers see exactly what a real press produces.
+    /// Both edges are sent because handlers split across them: a plain click acts on the PRESS, while
+    /// anything drag-like arms on press and completes on release, and sending only half leaves the second
+    /// kind stuck mid-gesture.
+    ///
+    /// Position is the control's own centre in LOCAL coordinates, which is what <c>gui_input</c> carries;
+    /// a handler that hit-tests a sub-region (a row with several buttons) needs a point actually inside it.
+    /// </remarks>
+    static bool PressViaGuiInput(Control control) {
+        if (!ListensForGuiInput(control))
+            return false;
+
+        var centre = control.Size / 2f;
+        foreach (var pressed in new[] { true, false }) {
+            var ev = new InputEventMouseButton {
+                ButtonIndex = MouseButton.Left,
+                Pressed = pressed,
+                Position = centre,
+                GlobalPosition = control.GlobalPosition + centre,
+            };
+            control.EmitSignal(Control.SignalName.GuiInput, ev);
+        }
+
+        return true;
     }
 
     static JsonNode Toggle(Control control, int index, JsonObject args) {
@@ -251,7 +286,20 @@ internal sealed class DevUiTool : IMcpTool {
     /// zero controls on every vanilla screen. KitLib's own panels DO use Godot buttons, hence both.
     /// </remarks>
     static bool IsInteractive(Control control) =>
-        control is BaseButton or LineEdit or TextEdit or NClickableControl;
+        control is BaseButton or LineEdit or TextEdit or NClickableControl || ListensForGuiInput(control);
+
+    /// <summary>
+    /// Whether this Control handles its own mouse events through <c>gui_input</c> rather than by being a
+    /// button of any kind.
+    /// </summary>
+    /// <remarks>
+    /// It is how a MOD builds a clickable that is not a button — a row, a panel handle, a footer control —
+    /// and none of those were listable or pressable here, so a whole class of mod UI could be seen but not
+    /// driven. Connections are required, not just the signal: EVERY Control declares <c>gui_input</c>, so
+    /// testing for the signal alone would list every label and spacer on screen.
+    /// </remarks>
+    static bool ListensForGuiInput(Control control) =>
+        control.GetSignalConnectionList(Control.SignalName.GuiInput).Count > 0;
 
     static JsonObject Describe(Control control, int index) {
         var described = new JsonObject {
