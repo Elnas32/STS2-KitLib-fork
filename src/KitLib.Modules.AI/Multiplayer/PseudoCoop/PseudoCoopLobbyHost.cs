@@ -59,6 +59,13 @@ internal static class PseudoCoopLobbyHost {
             if (mainMenu == null)
                 return Task.FromResult((false, "Main menu is not active. Return to the title screen and try again."));
 
+            // Close OUR previous host before binding the same port again. The run-end release below
+            // is not enough on its own: a session that never reached a clean run end -- a wedged run
+            // the player walked away from, or one abandoned without the official quit path -- leaves
+            // the old host bound, and StartHost then fails with CantCreate for the rest of the
+            // process' life. This is the case actually observed.
+            ReleaseHost();
+
             var netService = new NetHostGameService();
             var hostError = netService.StartENetHost(HostPort, MaxPlayers);
             if (hostError.HasValue)
