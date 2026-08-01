@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_read_text`** — 读取当前屏幕上的可见文本（标签、提示、面板、预测）并去除 BBCode，令 agent 能读出预览与提示的实际内容。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

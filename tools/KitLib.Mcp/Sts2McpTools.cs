@@ -108,6 +108,26 @@ internal sealed class Sts2McpTools {
             ["target_index"] = target_index,
         }, cancellationToken);
 
+    [McpServerTool(Name = "dev_read_text", ReadOnly = true), Description(
+        "Read visible on-screen text (labels, tooltips, panels, forecasts) in tree order. Use after "
+        + "dev_hover to read what a preview actually says; dev_ui lists only interactive controls.")]
+    public Task<string> DevReadText(
+        [Description("Only return entries whose text contains this, case-insensitive.")]
+        string? filter = null,
+        [Description("Maximum entries to return (default 120).")]
+        int limit = 120,
+        [Description("Skip text shorter than this (default 1).")]
+        int min_length = 1,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject {
+            ["limit"] = limit,
+            ["min_length"] = min_length,
+        };
+        if (!string.IsNullOrWhiteSpace(filter))
+            args["filter"] = filter;
+        return _bridge.CallToolAsync("dev_read_text", args, cancellationToken);
+    }
+
     [McpServerTool(Name = "dev_get_session", ReadOnly = true), Description(
         "Get DevMode session state: run active, game phase, dev-run flag, and blocking startup prompts.")]
     public Task<string> DevGetSession(CancellationToken cancellationToken = default) =>

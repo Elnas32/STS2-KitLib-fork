@@ -46,6 +46,7 @@ Connect any [Model Context Protocol](https://modelcontextprotocol.io) client (Cl
 - **`dev_add_monster`** — Add a monster mid-combat (DevMode enemy panel)
 - **`dev_set_cheat`** — Toggle cheats or set multipliers (`freeze_enemies`, `damage_multiplier`, …)
 - **`dev_set_stat`** — Set gold/energy/HP values or enable stat locks
+- **`dev_read_text`** — Read visible on-screen text (labels, tooltips, panels, forecasts), BBCode stripped. Pair with `dev_hover` to read what a preview says; `dev_ui` lists only interactive controls
 
 Health check: `GET http://127.0.0.1:9877/health`
 :::
@@ -70,6 +71,7 @@ Health check: `GET http://127.0.0.1:9877/health`
 - **`dev_add_monster`** — 战斗中加怪（Dev 敌人面板）
 - **`dev_set_cheat`** — 开关作弊或设倍率（`freeze_enemies`、`damage_multiplier` 等）
 - **`dev_set_stat`** — 设金币/能量/生命或开启数值锁定
+- **`dev_read_text`** — 读取当前屏幕上的文本（标签、提示、面板、预测），已去除 BBCode。与 `dev_hover` 配合可读出预览内容；`dev_ui` 仅列出可交互控件
 
 健康检查：`GET http://127.0.0.1:9877/health`
 :::

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_read_text`** — Read visible on-screen text (labels, tooltips, panels, forecasts) with BBCode stripped, so an agent can read what a preview or tooltip actually says.
+
 ## [0.32.1] - 2026-08-01
 
 ### Added
