@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `get_map_state`** — 用于路线规划的完整本章地图：每个节点的 row/col、类型与子节点（边），以及已走路径、当前位置、下一步可达节点与 Boss。地图界面关闭时同样可用。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

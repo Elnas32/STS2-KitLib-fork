@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `get_map_state`** — Full act map for route planning: every node with row/col, type and children (edges), plus the visited path, current position, the nodes reachable next, and the boss. Works with the map screen closed.
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

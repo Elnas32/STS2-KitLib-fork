@@ -33,6 +33,7 @@ Connect any [Model Context Protocol](https://modelcontextprotocol.io) client (Cl
 - **`get_selection_state`** — Active combat card selection UI and indexed options (id, name, cost)
 - **`selection_action`** — Pick cards on the active selection screen (`card_index`, `card_indices`, or `card_id`)
 - **`map_action`** — Map node, rewards, events, shop, rest
+- **`get_map_state`** — Full act map for route planning: every node (`row`, `col`, `pointType`, `children`), the visited path, current position, the nodes reachable next, and the boss. Works with the map screen closed; `get_game_state`'s `mapNodes` only lists what is reachable from where you stand
 - **`dev_get_session`** — Run active, game phase, dev-run flag, blocking startup prompts
 - **`dev_list_save_slots`** — Save slots with metadata and `debugNotes` for AI selection
 - **`dev_tag_save_slot`** — Set `debugNotes` on a slot (e.g. `combat:ironclad-act1-boss`)
@@ -57,6 +58,7 @@ Health check: `GET http://127.0.0.1:9877/health`
 - **`get_selection_state`** — 当前战斗内卡牌选择界面及带 index 的选项（id、名称、费用）
 - **`selection_action`** — 在打开的选择界面上点选（`card_index`、`card_indices` 或 `card_id`）
 - **`map_action`** — 地图节点、奖励、事件、商店、休息
+- **`get_map_state`** — 用于路线规划的完整本章地图：每个节点（`row`、`col`、`pointType`、`children`）、已走路径、当前位置、下一步可达节点与 Boss。地图界面关闭时同样可用；`get_game_state` 的 `mapNodes` 只列出当前位置可达的节点
 - **`dev_get_session`** — 是否在局、游戏阶段、是否 dev 局、阻塞的启动提示
 - **`dev_list_save_slots`** — 存档槽及元数据、`debugNotes`（供 AI 选档）
 - **`dev_tag_save_slot`** — 给槽位写 `debugNotes`（如 `combat:ironclad-act1-boss`）
