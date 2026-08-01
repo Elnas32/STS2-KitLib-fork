@@ -5,6 +5,7 @@ using Godot;
 using KitLib.Host;
 using KitLib.Multiplayer.SyncBot;
 using KitLib.Settings;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer;
@@ -21,6 +22,12 @@ namespace KitLib.Multiplayer.PseudoCoop;
 internal static class PseudoCoopLobbyHost {
     const ushort HostPort = 33771;
     const int MaxPlayers = 4;
+
+    /// <summary>
+    /// The ENet host THIS class opened, so <see cref="ReleaseHost"/> can close it again. Only ever set
+    /// for a pseudo co-op session, so a real multiplayer game is never touched.
+    /// </summary>
+    static NetHostGameService? _hostedService;
 
     public sealed class LaunchOptions {
         public CharacterModel Character { get; init; } = null!;
@@ -57,6 +64,9 @@ internal static class PseudoCoopLobbyHost {
             if (hostError.HasValue)
                 return Task.FromResult((false, $"ENet host failed: {hostError.Value}"));
 
+            // Remember it so the run end can close it again -- see ReleaseHost.
+            _hostedService = netService;
+
             var charSelect = mainMenu.SubmenuStack.GetSubmenuType<NCharacterSelectScreen>();
             // AfterInitialized (inside InitializeMultiplayerAsHost) wires RemoteCursor etc.
             // Do not call RemoteCursor.Initialize again — it Disposes the lobby InputSynchronizer.
@@ -82,6 +92,27 @@ internal static class PseudoCoopLobbyHost {
         catch (Exception ex) {
             KitLog.Warn("PseudoCoop", $"Host start failed: {ex}");
             return Task.FromResult((false, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Closes the ENet host opened by <see cref="TryStartAsync"/>. Leaving a pseudo co-op run does not
+    /// go through the official host-quit path, so nothing else released port 33771 and the NEXT
+    /// "Start pseudo co-op" in the same session died on <c>StartHost</c> with <c>CantCreate</c> --
+    /// only a game restart cleared it. Safe to call when no host was opened, and it never touches a
+    /// real multiplayer session because <see cref="_hostedService"/> is only set by this class.
+    /// </summary>
+    internal static void ReleaseHost() {
+        var service = _hostedService;
+        _hostedService = null;
+        if (service == null) return;
+
+        try {
+            service.Disconnect(NetError.Quit);
+            KitLog.Info("PseudoCoop", $"Released ENet host on port {HostPort}.");
+        }
+        catch (Exception ex) {
+            KitLog.Warn("PseudoCoop", $"Releasing ENet host failed: {ex.Message}");
         }
     }
 

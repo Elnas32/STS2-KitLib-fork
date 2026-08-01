@@ -38,6 +38,7 @@ internal static class MpCheatSyncBot {
         SimulatedPeerRegistry.OnRunEnded();
         MpAiTeammateHost.OnRunEnded();
         CompanionBridge.OnRunEnded();
+        PseudoCoopLobbyHost.ReleaseHost();
     }
 
     public static NetPlayerChoiceResult DefaultIndexChoice() => new() {
