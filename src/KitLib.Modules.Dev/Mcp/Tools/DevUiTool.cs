@@ -214,8 +214,13 @@ internal sealed class DevUiTool : IMcpTool {
             Walk(child, found);
     }
 
+    /// <remarks>
+    /// The game's own UI is NOT built on Godot's <c>BaseButton</c>: <c>NClickableControl</c> derives
+    /// straight from <c>Control</c> and <c>NButton</c> from that, so a BaseButton-only sweep returns
+    /// zero controls on every vanilla screen. KitLib's own panels DO use Godot buttons, hence both.
+    /// </remarks>
     static bool IsInteractive(Control control) =>
-        control is BaseButton or LineEdit or TextEdit;
+        control is BaseButton or LineEdit or TextEdit or NClickableControl;
 
     static JsonObject Describe(Control control, int index) {
         var described = new JsonObject {
@@ -230,6 +235,9 @@ internal sealed class DevUiTool : IMcpTool {
             if (button.ToggleMode)
                 described["pressed"] = button.ButtonPressed;
         }
+
+        if (control is NClickableControl clickable)
+            described["disabled"] = !clickable.IsEnabled;
 
         if (control is OptionButton picker) {
             var options = new JsonArray();
