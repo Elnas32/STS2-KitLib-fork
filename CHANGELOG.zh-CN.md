@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_add_potion`** — 按 model id 给本地玩家授予药水，相当于 `dev_add_card` / `dev_add_relic` 的药水版。传 `search` 可在无对局时列出 id。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

@@ -108,6 +108,24 @@ internal sealed class Sts2McpTools {
             ["target_index"] = target_index,
         }, cancellationToken);
 
+    [McpServerTool(Name = "dev_add_potion"), Description(
+        "Grant a potion to the local player by model id. Pass 'search' instead to look an id up.")]
+    public Task<string> DevAddPotion(
+        [Description("Potion model ID, e.g. FIRE_POTION, BLOCK_POTION.")]
+        string? potion_id = null,
+        [Description("List potion ids containing this text instead of granting. Empty string lists all.")]
+        string? search = null,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject();
+        // search is checked FIRST by the bridge and needs no run, so forward it alone when given --
+        // sending both would silently turn a grant into a lookup.
+        if (search != null)
+            args["search"] = search;
+        else if (!string.IsNullOrWhiteSpace(potion_id))
+            args["potion_id"] = potion_id.Trim();
+        return _bridge.CallToolAsync("dev_add_potion", args, cancellationToken);
+    }
+
     [McpServerTool(Name = "dev_get_session", ReadOnly = true), Description(
         "Get DevMode session state: run active, game phase, dev-run flag, and blocking startup prompts.")]
     public Task<string> DevGetSession(CancellationToken cancellationToken = default) =>

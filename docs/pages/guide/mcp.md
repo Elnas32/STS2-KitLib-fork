@@ -41,6 +41,7 @@ Connect any [Model Context Protocol](https://modelcontextprotocol.io) client (Cl
 - **`dev_list_cards`** — List cards in deck / hand / draw / discard / exhaust (or all piles)
 - **`dev_add_card`** — Add a card to a pile (`card_id`, `target`, `duration`, `upgrade_levels`)
 - **`dev_remove_card`** — Remove a card by `card_id` or `pile_index` from a pile
+- **`dev_add_potion`** — Grant a potion by model id (`potion_id`), or pass `search` to list ids
 - **`dev_list_monsters`** — List monster model IDs (for `dev_add_monster`)
 - **`dev_list_enemies`** — List enemies currently in combat (index, HP, monsterId)
 - **`dev_add_monster`** — Add a monster mid-combat (DevMode enemy panel)
@@ -65,6 +66,7 @@ Health check: `GET http://127.0.0.1:9877/health`
 - **`dev_list_cards`** — 列出牌组 / 手牌 / 抽牌堆 / 弃牌堆 / 消耗堆（或全部堆）
 - **`dev_add_card`** — 往某堆加牌（`card_id`、`target`、`duration`、`upgrade_levels`）
 - **`dev_remove_card`** — 按 `card_id` 或 `pile_index` 从某堆移除
+- **`dev_add_potion`** — 按 model id 授予药水（`potion_id`）；传 `search` 则列出 id
 - **`dev_list_monsters`** — 怪物 model ID 列表（供 `dev_add_monster`）
 - **`dev_list_enemies`** — 当前战斗中的敌人（index、HP、monsterId）
 - **`dev_add_monster`** — 战斗中加怪（Dev 敌人面板）
