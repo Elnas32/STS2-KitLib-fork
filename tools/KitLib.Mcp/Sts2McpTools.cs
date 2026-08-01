@@ -108,6 +108,13 @@ internal sealed class Sts2McpTools {
             ["target_index"] = target_index,
         }, cancellationToken);
 
+    [McpServerTool(Name = "get_map_state", ReadOnly = true), Description(
+        "Full act map for route planning: every node with row/col, type and children (edges), plus the visited "
+        + "path, current position, the nodes reachable next, and the boss. Works with the map screen closed. "
+        + "get_game_state's mapNodes only lists the nodes reachable from where you stand.")]
+    public Task<string> GetMapState(CancellationToken cancellationToken = default) =>
+        _bridge.CallToolAsync("get_map_state", new JsonObject(), cancellationToken);
+
     [McpServerTool(Name = "dev_get_session", ReadOnly = true), Description(
         "Get DevMode session state: run active, game phase, dev-run flag, and blocking startup prompts.")]
     public Task<string> DevGetSession(CancellationToken cancellationToken = default) =>
