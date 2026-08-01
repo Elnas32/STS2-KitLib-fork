@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Pseudo co-op ascension and modifiers** — `PseudoCoopLobbyHost.LaunchOptions` carries an ascension level and a run modifier list, so a launch can reproduce an existing run instead of inheriting character select's last ascension and no modifiers.
 - **MCP `get_map_state`** — Full act map for route planning: every node with row/col, type and children (edges), plus the visited path, current position, the nodes reachable next, and the boss. Works with the map screen closed.
 - **MCP `dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields) by index, so menus and dialogs can be driven without a mouse. Also drives mod-added controls that are not buttons at all and handle their own `gui_input` — rows, panel handles, footer controls — and has a `focus` action for screens that act on Godot's `FocusEntered` rather than on a press, which is what makes character select reachable.
+- **MCP `dev_read_text`** — Read visible on-screen text (labels, tooltips, panels, forecasts) with BBCode stripped, so an agent can read what a preview or tooltip actually says.
 
 ### Changed
 
