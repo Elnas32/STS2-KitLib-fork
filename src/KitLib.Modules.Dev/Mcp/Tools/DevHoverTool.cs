@@ -38,13 +38,21 @@ internal sealed class DevHoverTool : IMcpTool {
     // a mouse has one pointer: the game never has two hovered elements either.
     private static Node? _focused;
 
+    // How it was focused, so it can be released the same way. See Unfocus.
+    private static bool _focusedViaSignal;
+
+    private static readonly StringName MouseEnteredSignal = Control.SignalName.MouseEntered;
+    private static readonly StringName MouseExitedSignal = Control.SignalName.MouseExited;
+
     public string Name => "dev_hover";
 
     public string Description =>
         "Hover (focus) a UI element so hover-only behaviour fires. target takes an alias (map_node, "
         + "reward_alternative, rest_option, relic, boss_icon, event_option, potion, card, creature, "
-        + "treasure_relic) or ANY node type name. Use target 'list' to see what is hoverable on screen, "
-        + "'none' to unhover. Omit index to list that target's instances. Pair with dev_read_text to "
+        + "treasure_relic) or ANY node type name, including plain Godot Controls a MOD added "
+        + "(PanelContainer, HBoxContainer, TextureRect) — those are driven by emitting mouse_entered. "
+        + "Use target 'list' to see what is hoverable on screen, 'none' to unhover. Omit index to list "
+        + "that target's instances, each tagged via=focus|signal|none. Pair with dev_read_text to "
         + "read the panel the hover opens.";
 
     public string InputSchemaJson => """
@@ -53,7 +61,7 @@ internal sealed class DevHoverTool : IMcpTool {
         "properties": {
             "target": {
                 "type": "string",
-                "description": "Alias (map_node, reward_alternative, rest_option, relic, boss_icon, event_option, potion, card, creature, treasure_relic), any node type name (e.g. NTopBarDeckButton), 'list' to discover what is on screen, or 'none' to unhover."
+                "description": "Alias (map_node, reward_alternative, rest_option, relic, boss_icon, event_option, potion, card, creature, treasure_relic), any node type name (e.g. NTopBarDeckButton, or a mod's own PanelContainer / TextureRect), 'list' to discover what is on screen, or 'none' to unhover."
             },
             "index": {
                 "type": "integer",
@@ -116,10 +124,23 @@ internal sealed class DevHoverTool : IMcpTool {
 
         Unfocus();
         var chosen = candidates[index];
-        if (!Invoke(chosen, "OnFocus"))
-            return DevCardMcpHelper.Fail($"{chosen.GetType().Name} has no OnFocus to invoke.");
+
+        // OnFocus first, because that is what the game calls on its own nodes. A node WITHOUT one is not
+        // un-hoverable: a Control that wires Godot's mouse_entered signal directly is hovered by emitting
+        // it, which is the same call Godot makes when a real cursor crosses the control. That covers every
+        // surface a MOD adds to a screen — panels, rows and injected icons are plain Controls with signal
+        // handlers, not game node types with an override — and those were unreachable until now.
+        var viaSignal = false;
+        if (!Invoke(chosen, "OnFocus")) {
+            if (!EmitMouseSignal(chosen, MouseEnteredSignal))
+                return DevCardMcpHelper.Fail(
+                    $"{chosen.GetType().Name} has no OnFocus to invoke and nothing listening on mouse_entered.");
+
+            viaSignal = true;
+        }
 
         _focused = chosen;
+        _focusedViaSignal = viaSignal;
 
         var clicked = false;
         if (args.TryGetPropertyValue("click", out var clickNode)
@@ -188,7 +209,11 @@ internal sealed class DevHoverTool : IMcpTool {
     /// "you named something that is not a node type here" (an error worth reporting).
     /// </summary>
     private static bool IsKnownTypeName(Node root, string typeName) =>
-        Aliases.ContainsValue(typeName) || typeName.StartsWith("N", StringComparison.Ordinal);
+        Aliases.ContainsValue(typeName)
+        || typeName.StartsWith("N", StringComparison.Ordinal)
+        // Mod-added surfaces are plain Godot Controls (PanelContainer, HBoxContainer, TextureRect), so the
+        // N-prefix rule would reject the very names 'list' now reports as hoverable.
+        || ClassDB.ClassExists(typeName);
 
     /// <summary>Every focusable type currently on screen, so a caller can discover targets.</summary>
     private static JsonArray ListHoverableTypes(Node root) {
@@ -217,8 +242,8 @@ internal sealed class DevHoverTool : IMcpTool {
             return;
 
         // "Focusable" is exactly what this tool can drive: a type declaring OnFocus somewhere in its
-        // chain. Anything listed here is a valid target value.
-        if (node is Control && HasMethod(node, "OnFocus")) {
+        // chain, OR a Control listening on mouse_entered. Anything listed here is a valid target value.
+        if (node is Control && (HasMethod(node, "OnFocus") || ListensForMouse(node))) {
             var name = node.GetType().Name;
             counts[name] = counts.TryGetValue(name, out var n) ? n + 1 : 1;
         }
@@ -253,6 +278,10 @@ internal sealed class DevHoverTool : IMcpTool {
         var described = new JsonObject {
             ["type"] = node.GetType().Name,
             ["name"] = node.Name.ToString(),
+            // How this one would be driven — and "none" is the useful case: collecting by type name returns
+            // every node of that type, most of which are layout containers nothing listens on. Without this
+            // the caller can only find the hoverable ones by hovering each in turn and reading the failure.
+            ["via"] = HasMethod(node, "OnFocus") ? "focus" : ListensForMouse(node) ? "signal" : "none",
         };
 
         // A map point's coordinates and room type are what a caller actually selects on, so surface them
@@ -271,11 +300,38 @@ internal sealed class DevHoverTool : IMcpTool {
             return null;
 
         var name = _focused.GetType().Name;
-        if (GodotObject.IsInstanceValid(_focused))
-            Invoke(_focused, "OnUnfocus");
+        if (GodotObject.IsInstanceValid(_focused)) {
+            // Release it the same way it was taken: a node driven through its OnFocus override gets
+            // OnUnfocus, one driven through the signal gets mouse_exited. Sending the wrong one leaves the
+            // tip keyed to an owner nothing will ever clear, which is exactly the orphaned-tip leak.
+            if (_focusedViaSignal)
+                EmitMouseSignal(_focused, MouseExitedSignal);
+            else
+                Invoke(_focused, "OnUnfocus");
+        }
 
         _focused = null;
+        _focusedViaSignal = false;
         return name;
+    }
+
+    /// <summary>
+    /// Whether this Control listens for the mouse itself rather than through an <c>OnFocus</c> override.
+    /// </summary>
+    /// <remarks>
+    /// Connections are required, not just the signal: EVERY Control declares <c>mouse_entered</c>, so
+    /// without this every Label on screen would report as hoverable and the list would say nothing.
+    /// </remarks>
+    private static bool ListensForMouse(Node node) =>
+        node is Control && node.GetSignalConnectionList(MouseEnteredSignal).Count > 0;
+
+    /// <summary>Fires one of the mouse signals, reporting whether anything was actually listening.</summary>
+    private static bool EmitMouseSignal(Node node, StringName signal) {
+        if (node is not Control || node.GetSignalConnectionList(signal).Count == 0)
+            return false;
+
+        node.EmitSignal(signal);
+        return true;
     }
 
     // OnFocus/OnUnfocus are protected and declared on the concrete node type (or a base of it). GetMethod does
