@@ -25,7 +25,9 @@ internal static class MpPlayerChoicePendingPatch {
 
         if (!TryGetLastReservedChoiceId(state!, player, out var choiceId)) return;
 
-        MpPendingPlayerChoice.Register(ownerId, choiceId, options);
+        // Keep the paused action: nothing else can hand it to PlayerChoiceSyncBotPatch, and without it
+        // the simulated peer's action can never be resumed (see the comment there).
+        MpPendingPlayerChoice.Register(ownerId, choiceId, options, action);
     }
 
     static bool TryGetLastReservedChoiceId(RunState state, Player player, out uint choiceId) {
