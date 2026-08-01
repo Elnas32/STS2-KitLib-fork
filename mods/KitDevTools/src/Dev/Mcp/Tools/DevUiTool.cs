@@ -267,15 +267,54 @@ internal sealed class DevUiTool : IMcpTool {
         if (!string.IsNullOrWhiteSpace(text))
             return text;
 
-        foreach (var child in control.GetChildren()) {
-            if (child is Label label && !string.IsNullOrWhiteSpace(label.Text))
-                return label.Text;
-            if (child is RichTextLabel rich && !string.IsNullOrWhiteSpace(rich.Text))
-                return rich.Text;
+        var fromChildren = FindLabelText(control);
+        if (!string.IsNullOrWhiteSpace(fromChildren))
+            return fromChildren;
+
+        // A row like HBox[CheckBox, Label] is the dominant shape in KitLib's own panels, and there the
+        // caption is a SIBLING, not a child. Without this a settings page lists dozens of controls with
+        // empty labels -- which is only navigable by blind index, so the tool is useless exactly where
+        // it is needed most. Nearest-first from our own position, so a row with several controls gives
+        // each the caption next to it rather than all of them the first one.
+        var parent = control.GetParent();
+        if (parent == null)
+            return string.Empty;
+
+        var siblings = parent.GetChildren();
+        var self = siblings.IndexOf(control);
+        for (int distance = 1; distance < siblings.Count; distance++) {
+            foreach (var candidate in new[] { self + distance, self - distance }) {
+                if (candidate < 0 || candidate >= siblings.Count)
+                    continue;
+                // Another interactive control ends the row: past it, any caption belongs to that one.
+                if (siblings[candidate] is Control other && IsInteractive(other))
+                    return string.Empty;
+
+                var found = DirectLabelText(siblings[candidate]);
+                if (!string.IsNullOrWhiteSpace(found))
+                    return found;
+            }
         }
 
         return string.Empty;
     }
+
+    static string FindLabelText(Node node) {
+        foreach (var child in node.GetChildren()) {
+            var text = DirectLabelText(child);
+            if (!string.IsNullOrWhiteSpace(text))
+                return text;
+        }
+        return string.Empty;
+    }
+
+    static string DirectLabelText(Node node) => node switch {
+        Label label => label.Text,
+        RichTextLabel rich => rich.Text,
+        // A caption is often wrapped one level down (a margin/centre container around the Label).
+        Container container => FindLabelText(container),
+        _ => string.Empty,
+    };
 
     static bool Contains(string haystack, string needle) =>
         !string.IsNullOrEmpty(haystack)
