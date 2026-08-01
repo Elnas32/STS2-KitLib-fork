@@ -108,6 +108,38 @@ internal sealed class Sts2McpTools {
             ["target_index"] = target_index,
         }, cancellationToken);
 
+    [McpServerTool(Name = "dev_ui"), Description(
+        "List and drive on-screen UI controls (buttons, checkboxes, dropdowns, text fields) by index. "
+        + "Use action 'list' first, then click/toggle/select/set_text. This is how menus and dialogs are "
+        + "driven; dev_hover only covers hover-only game surfaces.")]
+    public Task<string> DevUi(
+        [Description("list, click, toggle, select, or set_text.")]
+        string action = "list",
+        [Description("Case-insensitive substring on label, node name or type. Indexes are relative to the FILTERED list.")]
+        string? filter = null,
+        [Description("Which control, from the list this tool returns.")]
+        int index = -1,
+        [Description("For set_text: the value to type.")]
+        string? text = null,
+        [Description("For select: the item index inside a dropdown.")]
+        int option = -1,
+        [Description("For toggle: desired state. Omit to flip.")]
+        bool? pressed = null,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject {
+            ["action"] = action,
+            ["index"] = index,
+            ["option"] = option,
+        };
+        if (!string.IsNullOrWhiteSpace(filter))
+            args["filter"] = filter;
+        if (text != null)
+            args["text"] = text;
+        if (pressed.HasValue)
+            args["pressed"] = pressed.Value;
+        return _bridge.CallToolAsync("dev_ui", args, cancellationToken);
+    }
+
     [McpServerTool(Name = "dev_get_session", ReadOnly = true), Description(
         "Get DevMode session state: run active, game phase, dev-run flag, and blocking startup prompts.")]
     public Task<string> DevGetSession(CancellationToken cancellationToken = default) =>

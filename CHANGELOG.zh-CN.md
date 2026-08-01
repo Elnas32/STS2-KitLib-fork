@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_ui`** — 按 index 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框），无需鼠标即可驱动菜单与对话框。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

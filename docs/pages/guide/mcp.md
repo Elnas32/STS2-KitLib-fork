@@ -46,6 +46,7 @@ Connect any [Model Context Protocol](https://modelcontextprotocol.io) client (Cl
 - **`dev_add_monster`** — Add a monster mid-combat (DevMode enemy panel)
 - **`dev_set_cheat`** — Toggle cheats or set multipliers (`freeze_enemies`, `damage_multiplier`, …)
 - **`dev_set_stat`** — Set gold/energy/HP values or enable stat locks
+- **`dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields): `list` to see what is on screen, then `click` / `toggle` / `select` / `set_text` by index. Drives menus and dialogs; `dev_hover` only covers hover-only game surfaces
 
 Health check: `GET http://127.0.0.1:9877/health`
 :::
@@ -70,6 +71,7 @@ Health check: `GET http://127.0.0.1:9877/health`
 - **`dev_add_monster`** — 战斗中加怪（Dev 敌人面板）
 - **`dev_set_cheat`** — 开关作弊或设倍率（`freeze_enemies`、`damage_multiplier` 等）
 - **`dev_set_stat`** — 设金币/能量/生命或开启数值锁定
+- **`dev_ui`** — 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框）：先 `list` 查看当前屏幕上的控件，再按 index `click` / `toggle` / `select` / `set_text`。用于驱动菜单与对话框；`dev_hover` 仅覆盖悬停类游戏界面
 
 健康检查：`GET http://127.0.0.1:9877/health`
 :::
