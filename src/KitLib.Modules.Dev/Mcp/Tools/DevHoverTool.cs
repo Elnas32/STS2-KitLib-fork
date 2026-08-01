@@ -34,12 +34,11 @@ namespace KitLib.Mcp.Tools;
 /// </para>
 /// </remarks>
 internal sealed class DevHoverTool : IMcpTool {
-    // What was focused last, so the next hover (or an explicit clear) can release it. Single-valued because
-    // a mouse has one pointer: the game never has two hovered elements either.
-    private static Node? _focused;
-
-    // How it was focused, so it can be released the same way. See Unfocus.
-    private static bool _focusedViaSignal;
+    // What is currently focused, innermost last. Normally holds one — a mouse has one pointer — but a panel
+    // that OPENS on a hover has to be read while the thing that opened it is still hovered, so
+    // release_previous:false stacks onto this instead of replacing. Released in reverse, innermost first,
+    // which is the order a real cursor leaves a nested surface.
+    private static readonly List<(Node Node, bool ViaSignal)> _focused = new();
 
     private static readonly StringName MouseEnteredSignal = Control.SignalName.MouseEntered;
     private static readonly StringName MouseExitedSignal = Control.SignalName.MouseExited;
@@ -72,6 +71,11 @@ internal sealed class DevHoverTool : IMcpTool {
                 "type": "boolean",
                 "description": "Also click it after focusing. Lets a hover preview be compared against what committing to it actually does.",
                 "default": false
+            },
+            "release_previous": {
+                "type": "boolean",
+                "description": "Unhover what is already hovered first (default true). Pass false to STACK a hover — needed to read a panel that a hover opened, since such panels poll the cursor's real position and close as soon as their opener reports an exit. 'none' releases the whole stack.",
+                "default": true
             }
         },
         "required": ["target"]
@@ -88,7 +92,7 @@ internal sealed class DevHoverTool : IMcpTool {
 
         var target = targetNode.GetValue<string>()!.Trim().ToLowerInvariant();
         if (target == "none") {
-            var cleared = Unfocus();
+            var cleared = UnfocusAll();
             return new JsonObject { ["ok"] = true, ["unfocused"] = cleared };
         }
 
@@ -122,7 +126,14 @@ internal sealed class DevHoverTool : IMcpTool {
         if (index >= candidates.Count)
             return DevCardMcpHelper.Fail($"index {index} out of range — {candidates.Count} '{target}' on screen.");
 
-        Unfocus();
+        // Releasing what is already hovered is right for a pointer moving between siblings, and WRONG for
+        // reading a panel a hover opened: those panels poll the cursor's real position and take themselves
+        // down the moment their opener reports an exit, so the rows would be gone before they could be read.
+        var releasePrevious = !args.TryGetPropertyValue("release_previous", out var releaseNode)
+            || releaseNode?.GetValueKind() != JsonValueKind.False;
+        if (releasePrevious)
+            UnfocusAll();
+
         var chosen = candidates[index];
 
         // OnFocus first, because that is what the game calls on its own nodes. A node WITHOUT one is not
@@ -139,8 +150,7 @@ internal sealed class DevHoverTool : IMcpTool {
             viaSignal = true;
         }
 
-        _focused = chosen;
-        _focusedViaSignal = viaSignal;
+        _focused.Add((chosen, viaSignal));
 
         var clicked = false;
         if (args.TryGetPropertyValue("click", out var clickNode)
@@ -152,7 +162,7 @@ internal sealed class DevHoverTool : IMcpTool {
             // what makes a hover preview comparable against actually committing to it.
             clickable.ForceClick();
             clicked = true;
-            _focused = null;   // the node this focused is usually torn down by its own handler
+            _focused.Clear();   // the node this focused is usually torn down by its own handler
         }
 
         return new JsonObject {
@@ -295,24 +305,29 @@ internal sealed class DevHoverTool : IMcpTool {
         return described;
     }
 
-    private static string? Unfocus() {
-        if (_focused == null)
+    /// <summary>Releases everything currently hovered, innermost first, and names what it let go.</summary>
+    private static JsonArray? UnfocusAll() {
+        if (_focused.Count == 0)
             return null;
 
-        var name = _focused.GetType().Name;
-        if (GodotObject.IsInstanceValid(_focused)) {
+        var released = new JsonArray();
+        for (var i = _focused.Count - 1; i >= 0; i--) {
+            var (node, viaSignal) = _focused[i];
+            released.Add(node.GetType().Name);
+            if (!GodotObject.IsInstanceValid(node))
+                continue;
+
             // Release it the same way it was taken: a node driven through its OnFocus override gets
             // OnUnfocus, one driven through the signal gets mouse_exited. Sending the wrong one leaves the
             // tip keyed to an owner nothing will ever clear, which is exactly the orphaned-tip leak.
-            if (_focusedViaSignal)
-                EmitMouseSignal(_focused, MouseExitedSignal);
+            if (viaSignal)
+                EmitMouseSignal(node, MouseExitedSignal);
             else
-                Invoke(_focused, "OnUnfocus");
+                Invoke(node, "OnUnfocus");
         }
 
-        _focused = null;
-        _focusedViaSignal = false;
-        return name;
+        _focused.Clear();
+        return released;
     }
 
     /// <summary>

@@ -227,20 +227,25 @@ internal sealed class Sts2McpTools {
     [McpServerTool(Name = "dev_hover"), Description(
         "Hover (focus) a UI element so hover-only behaviour fires. target takes an alias (map_node, "
         + "reward_alternative, rest_option, relic, boss_icon, event_option, potion, card, creature, "
-        + "treasure_relic) or ANY node type name; 'list' discovers what is hoverable on screen, 'none' "
-        + "unhovers. Pair with dev_read_text to read the panel the hover opens.")]
+        + "treasure_relic) or ANY node type name, including plain Godot Controls a MOD added "
+        + "(PanelContainer, HBoxContainer, TextureRect) — those are driven by emitting mouse_entered; "
+        + "'list' discovers what is hoverable on screen, 'none' unhovers. Listed instances carry "
+        + "via=focus|signal|none. Pair with dev_read_text to read the panel the hover opens.")]
     public Task<string> DevHover(
-        [Description("Alias, any node type name (e.g. NTopBarBossIcon), 'list' to discover, or 'none' to unhover.")]
+        [Description("Alias, any node type name (e.g. NTopBarBossIcon, or a mod's own PanelContainer), 'list' to discover, or 'none' to unhover.")]
         string target,
         [Description("Which one to hover, from the list this tool returns. Omit to only list them.")]
         int index = -1,
         [Description("Also click it after focusing (default false).")]
         bool click = false,
+        [Description("Unhover what is already hovered first (default true). Pass false to STACK a hover — needed to read a panel a hover opened, since such panels poll the cursor's real position and close when their opener reports an exit.")]
+        bool release_previous = true,
         CancellationToken cancellationToken = default) =>
         _bridge.CallToolAsync("dev_hover", new JsonObject {
             ["target"] = target,
             ["index"] = index,
             ["click"] = click,
+            ["release_previous"] = release_previous,
         }, cancellationToken);
 
     [McpServerTool(Name = "dev_list_monsters", ReadOnly = true), Description(
