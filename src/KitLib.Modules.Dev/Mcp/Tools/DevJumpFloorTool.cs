@@ -2,6 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Map;
+using MegaCrit.Sts2.Core.Nodes.Screens.Map;
+using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Runs.History;
 
@@ -124,6 +126,14 @@ internal sealed class DevJumpFloorTool : IMcpTool {
             floorNote = floorsAdded > 0
                 ? "Floors are synthetic: no rooms were entered, no rewards generated and no RNG stream moved."
                 : null;
+        }
+
+        // Land somewhere usable. EnterAct ends in a MapRoom, but the map screen it leaves behind is the one
+        // the act-change VOTE would have re-enabled travel on, and jumping skipped the vote — so without this
+        // the run sits on a map you cannot hover or travel, which is worse than not having jumped.
+        if (actsEntered > 0) {
+            await RunManager.Instance!.EnterRoom(new MapRoom());
+            NMapScreen.Instance?.SetTravelEnabled(enabled: true);
         }
 
         return new JsonObject {
