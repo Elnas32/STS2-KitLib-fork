@@ -268,4 +268,25 @@ internal sealed class Sts2McpTools {
             args["lock"] = @lock.Value;
         return _bridge.CallToolAsync("dev_set_stat", args, cancellationToken);
     }
+
+    [McpServerTool(Name = "dev_enter_room"), Description(
+        "Enter a room directly, by event id (e.g. CRYSTAL_SPHERE) or by room type, instead of walking the "
+        + "map to find one. Pass 'search' to list matching event ids. Enters a REAL room: the floor advances.")]
+    public Task<string> DevEnterRoom(
+        [Description("Event model id to enter, e.g. CRYSTAL_SPHERE.")]
+        string? event_id = null,
+        [Description("Room type when no event is named: Monster, Elite, Boss, Treasure, Shop, RestSite, Event.")]
+        string? room = null,
+        [Description("List event ids containing this text instead of entering anything. Empty string lists all.")]
+        string? search = null,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject();
+        if (search != null)
+            args["search"] = search;
+        if (!string.IsNullOrWhiteSpace(event_id))
+            args["event_id"] = event_id.Trim();
+        if (!string.IsNullOrWhiteSpace(room))
+            args["room"] = room.Trim();
+        return _bridge.CallToolAsync("dev_enter_room", args, cancellationToken);
+    }
 }
