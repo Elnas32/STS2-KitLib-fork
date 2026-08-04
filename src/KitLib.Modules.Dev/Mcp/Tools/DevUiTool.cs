@@ -32,8 +32,9 @@ internal sealed class DevUiTool : IMcpTool {
     public string Description =>
         "List and drive on-screen UI controls (buttons, checkboxes, dropdowns, text fields, and mod-added "
         + "controls that handle their own gui_input) by index: action 'list' to see what is on screen, then "
-        + "'click', 'toggle', 'select' or 'set_text'. Use this to open menus and fill dialogs -- dev_hover "
-        + "only covers hover-only game surfaces.";
+        + "'click', 'toggle', 'select', 'set_text' or 'focus'. Use this to open menus and fill dialogs -- "
+        + "dev_hover only covers hover-only game surfaces. 'focus' is for screens that act on Godot's "
+        + "FocusEntered rather than on a press, such as character select, where clicking does nothing.";
 
     public string InputSchemaJson => """
     {
@@ -41,7 +42,7 @@ internal sealed class DevUiTool : IMcpTool {
         "properties": {
             "action": {
                 "type": "string",
-                "description": "list, click, toggle, select, or set_text.",
+                "description": "list, click, toggle, select, set_text, or focus. Use focus for screens that act on Godot's FocusEntered rather than on a press -- character select is one, where clicking does nothing.",
                 "default": "list"
             },
             "filter": {
@@ -98,8 +99,36 @@ internal sealed class DevUiTool : IMcpTool {
             "toggle" => Toggle(control, index, args),
             "select" => Select(control, index, Int(args, "option", -1)),
             "set_text" => SetText(control, index, Str(args, "text") ?? string.Empty),
-            _ => DevCardMcpHelper.Fail($"Unknown action '{action}'. Use list, click, toggle, select, or set_text."),
+            "focus" => Focus(control, index),
+            _ => DevCardMcpHelper.Fail(
+                $"Unknown action '{action}'. Use list, click, toggle, select, set_text, or focus."),
         };
+    }
+
+    /// <summary>
+    /// Gives the control Godot's keyboard/controller FOCUS, which is a different thing from clicking it.
+    /// </summary>
+    /// <remarks>
+    /// Some screens key their real state change on <c>Control.FocusEntered</c> rather than on a press, so
+    /// clicking them does nothing at all. Character select is the case that forced this:
+    /// <c>NCharacterSelectButton</c> does <c>Connect(Control.SignalName.FocusEntered, Callable.From(Select))</c>
+    /// and leaves <c>OnPress</c> EMPTY, so every click -- real or forced -- left the screen on whichever
+    /// character was already selected, silently and with the button reporting success. Picking a character
+    /// was therefore impossible over the bridge, which is exactly the step every scenario starts from.
+    /// <para>
+    /// <c>GrabFocus</c> is what a controller/keyboard move does, so the handler runs the same way. It is
+    /// deliberately separate from <c>click</c>: the two are different inputs and a screen may listen on
+    /// either, so collapsing them would fire behaviour a real mouse never triggers.
+    /// </para>
+    /// </remarks>
+    static JsonNode Focus(Control control, int index) {
+        // A control that cannot take focus would silently do nothing, which is the failure this action exists
+        // to end -- so say so instead.
+        if (control.FocusMode == Control.FocusModeEnum.None)
+            return DevCardMcpHelper.Fail($"{Label(control)} has FocusMode.None and cannot take keyboard focus.");
+
+        control.GrabFocus();
+        return Ok(control, index, "focused");
     }
 
     static JsonNode Click(Control control, int index) {

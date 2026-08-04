@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **MCP `dev_ui`** — 按 index 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框），无需鼠标即可驱动菜单与对话框。也可驱动 mod 添加的、本身并非按钮而是自行处理 `gui_input` 的控件——行、面板拖柄、底栏控件等。
+- **MCP `dev_ui`** — 按 index 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框），无需鼠标即可驱动菜单与对话框。也可驱动 mod 添加的、本身并非按钮而是自行处理 `gui_input` 的控件——行、面板拖柄、底栏控件等；并提供 `focus` 动作，用于那些按 Godot `FocusEntered` 而非按下来响应的界面，选角色界面正是靠它才变得可驱动。
 
 ## [0.32.1] - 2026-08-01
 

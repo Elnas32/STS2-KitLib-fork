@@ -46,7 +46,7 @@ Connect any [Model Context Protocol](https://modelcontextprotocol.io) client (Cl
 - **`dev_add_monster`** — Add a monster mid-combat (DevMode enemy panel)
 - **`dev_set_cheat`** — Toggle cheats or set multipliers (`freeze_enemies`, `damage_multiplier`, …)
 - **`dev_set_stat`** — Set gold/energy/HP values or enable stat locks
-- **`dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields), plus mod-added controls that handle their own `gui_input`: `list` to see what is on screen, then `click` / `toggle` / `select` / `set_text` by index. Drives menus and dialogs; `dev_hover` only covers hover-only game surfaces
+- **`dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields), plus mod-added controls that handle their own `gui_input`: `list` to see what is on screen, then `click` / `toggle` / `select` / `set_text` / `focus` by index. Drives menus and dialogs; `dev_hover` only covers hover-only game surfaces. Use `focus` where a screen acts on Godot's `FocusEntered` instead of a press — character select selects on focus and ignores clicks entirely
 
 Health check: `GET http://127.0.0.1:9877/health`
 :::
@@ -71,7 +71,7 @@ Health check: `GET http://127.0.0.1:9877/health`
 - **`dev_add_monster`** — 战斗中加怪（Dev 敌人面板）
 - **`dev_set_cheat`** — 开关作弊或设倍率（`freeze_enemies`、`damage_multiplier` 等）
 - **`dev_set_stat`** — 设金币/能量/生命或开启数值锁定
-- **`dev_ui`** — 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框），以及 mod 添加的自行处理 `gui_input` 的控件：先 `list` 查看当前屏幕上的控件，再按 index `click` / `toggle` / `select` / `set_text`。用于驱动菜单与对话框；`dev_hover` 仅覆盖悬停类游戏界面
+- **`dev_ui`** — 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框），以及 mod 添加的自行处理 `gui_input` 的控件：先 `list` 查看当前屏幕上的控件，再按 index `click` / `toggle` / `select` / `set_text` / `focus`。用于驱动菜单与对话框；`dev_hover` 仅覆盖悬停类游戏界面。界面若按 Godot `FocusEntered` 而非按下响应，请用 `focus`——选角色界面就是聚焦即选中、完全忽略点击
 
 健康检查：`GET http://127.0.0.1:9877/health`
 :::
@@ -90,7 +90,7 @@ make dev-session
 Typical MCP agent flow after the bridge is ready:
 
 1. **`dev_list_save_slots`** — Pick a slot by `debugNotes`, `name`, floor, or character.
-2. **`dev_load_save_slot`** — Load the chosen slot, **or** **`dev_start_test_run`** when no suitable save exists (character select is manual in this MVP).
+2. **`dev_load_save_slot`** — Load the chosen slot, **or** **`dev_start_test_run`** when no suitable save exists, then **`dev_ui`** with `action: "focus"` to pick the character (that screen selects on focus, not on a click) and `action: "click"` on the confirm button to embark.
 3. Poll **`dev_get_session`** every 1–2s until `runActive` is `true` (load is async; allow up to ~30s).
 4. **`get_game_state`** + **`combat_action`** / **`map_action`** to drive the run.
 
@@ -102,7 +102,7 @@ Before a debugging session, tag saves with **`dev_tag_save_slot`** so agents can
 - `GET /health` can respond while the Godot main thread is stuck; if MCP tool calls time out, stop and investigate.
 - After changing mod code, run **`make sync`** and restart the game.
 
-**Not in this MVP:** auto character select, hang watchdog (kill/restart/reload), or autonomous code fixes.
+**Not in this MVP:** hang watchdog (kill/restart/reload) or autonomous code fixes.
 :::
 
 ::: zh-CN
@@ -115,7 +115,7 @@ make dev-session
 桥就绪后典型的 MCP agent 流程：
 
 1. **`dev_list_save_slots`** — 按 `debugNotes`、`name`、层数或角色选槽。
-2. **`dev_load_save_slot`** — 加载所选槽，**或** 没有合适存档时用 **`dev_start_test_run`**（本 MVP 选角色仍需手动）。
+2. **`dev_load_save_slot`** — 加载所选槽，**或** 没有合适存档时用 **`dev_start_test_run`**，再用 **`dev_ui`** 的 `action: "focus"` 选角色（该界面聚焦即选中，点击无效），然后 `action: "click"` 点确认出发。
 3. 每 1–2 秒轮询 **`dev_get_session`**，直到 `runActive` 为 `true`（加载异步，最多约 30 秒）。
 4. **`get_game_state`** + **`combat_action`** / **`map_action`** 驱动对局。
 
@@ -127,7 +127,7 @@ make dev-session
 - `GET /health` 可能在 Godot 主线程卡死时仍返回；MCP 工具超时则应停手排查。
 - 改 mod 代码后执行 **`make sync`** 并重启游戏。
 
-**本 MVP 尚未包含：** 自动选角色、挂死看门狗（杀进程/重启/重载）、或自主改代码。
+**本 MVP 尚未包含：** 挂死看门狗（杀进程/重启/重载）或自主改代码。
 :::
 
 ### Build proxy{lang="en"}
