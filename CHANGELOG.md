@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Pseudo co-op card choices** — A simulated peer playing a card that asks for a choice no longer stalls the fight. The choice was answered but the paused action was never resumed, so that peer's queue stopped draining: it played nothing further and never ended its turn, with the choice UI still on screen. Seen with Silent's Survivor.
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **伪联机卡牌选择** — 模拟队友打出需要做选择的卡牌不再卡住整场战斗。此前选择虽被应答，但被暂停的 action 从未恢复，该队友的队列不再推进：不再出任何牌、也永远不结束回合，选择界面还一直留在屏幕上。以丝萝的 Survivor 复现。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added
