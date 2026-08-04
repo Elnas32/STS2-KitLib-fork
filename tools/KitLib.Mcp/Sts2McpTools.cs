@@ -118,10 +118,11 @@ internal sealed class Sts2McpTools {
     [McpServerTool(Name = "dev_ui"), Description(
         "List and drive on-screen UI controls (buttons, checkboxes, dropdowns, text fields, and mod-added "
         + "controls that handle their own gui_input) by index. Use action 'list' first, then "
-        + "click/toggle/select/set_text. This is how menus and dialogs are driven; dev_hover only covers "
-        + "hover-only game surfaces.")]
+        + "click/toggle/select/set_text/focus. This is how menus and dialogs are driven; dev_hover only "
+        + "covers hover-only game surfaces. Use 'focus' where a screen acts on Godot's FocusEntered rather "
+        + "than on a press -- character select is one, where clicking does nothing.")]
     public Task<string> DevUi(
-        [Description("list, click, toggle, select, or set_text.")]
+        [Description("list, click, toggle, select, set_text, or focus.")]
         string action = "list",
         [Description("Case-insensitive substring on label, node name or type. Indexes are relative to the FILTERED list.")]
         string? filter = null,

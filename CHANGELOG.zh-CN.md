@@ -32,9 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **v0.110.1 上的伪联机队友生成** — 注册模拟玩家时抛出 `NullReferenceException`，生成流程中途中断，队友虽然留在本局中却没有行动队列，因此它出的每张牌都会被丢弃并被强制结束回合。 *[@Elnas32](https://github.com/Elnas32) · [PR #8](https://github.com/WRXinYue/STS2-KitLib/pull/8) · [108b87c](https://github.com/WRXinYue/STS2-KitLib/commit/108b87c)*
 - **v0.110.1 上的战斗就绪状态读取** — 「准备进入敌方回合」的逐玩家检查恒为 `false`，导致已经就绪的模拟玩家被反复重新标记。 *[@Elnas32](https://github.com/Elnas32) · [PR #8](https://github.com/WRXinYue/STS2-KitLib/pull/8) · [108b87c](https://github.com/WRXinYue/STS2-KitLib/commit/108b87c)*
 - **Dev 面板图标** — MDI 图标集改为在构建过程中生成，而不再只由 `make icons` 生成（而它没有任何依赖会触发）。此前 `KitLib.Panel` 根本没有打包图标集：构建始终成功，运行时每次图标查找却都记录 `icon '<name>' not found`。 *[@Elnas32](https://github.com/Elnas32) · [PR #13](https://github.com/WRXinYue/STS2-KitLib/pull/13) · [b78a311](https://github.com/WRXinYue/STS2-KitLib/commit/b78a311)*
-### Added
-
-- **MCP `dev_ui`** — 按 index 列出并操作普通 UI 控件（按钮、勾选框、下拉框、文本框），无需鼠标即可驱动菜单与对话框。也可驱动 mod 添加的、本身并非按钮而是自行处理 `gui_input` 的控件——行、面板拖柄、底栏控件等。
 
 ## [0.32.1] - 2026-08-01
 
