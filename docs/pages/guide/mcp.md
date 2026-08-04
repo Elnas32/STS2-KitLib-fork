@@ -46,6 +46,7 @@ Connect any [Model Context Protocol](https://modelcontextprotocol.io) client (Cl
 - **`dev_add_monster`** — Add a monster mid-combat (DevMode enemy panel)
 - **`dev_set_cheat`** — Toggle cheats or set multipliers (`freeze_enemies`, `damage_multiplier`, …)
 - **`dev_set_stat`** — Set gold/energy/HP values or enable stat locks
+- **`dev_enter_room`** — Enter a room directly by `event_id` (e.g. `CRYSTAL_SPHERE`) or `room` type instead of walking the map to find one; `search` lists matching event ids. Enters a real room, so the floor advances
 
 Health check: `GET http://127.0.0.1:9877/health`
 :::
@@ -70,6 +71,7 @@ Health check: `GET http://127.0.0.1:9877/health`
 - **`dev_add_monster`** — 战斗中加怪（Dev 敌人面板）
 - **`dev_set_cheat`** — 开关作弊或设倍率（`freeze_enemies`、`damage_multiplier` 等）
 - **`dev_set_stat`** — 设金币/能量/生命或开启数值锁定
+- **`dev_enter_room`** — 直接按 `event_id`（如 `CRYSTAL_SPHERE`）或 `room` 类型进入房间，不必在地图上找；`search` 可列出匹配的事件 id。进入的是真实房间，层数会推进
 
 健康检查：`GET http://127.0.0.1:9877/health`
 :::

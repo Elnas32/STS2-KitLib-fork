@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_enter_room`** — 直接按事件 id（如 `CRYSTAL_SPHERE`）或房间类型进入房间，不必在地图上一路走到它出现，这样针对某个具体事件报的 bug 就能在它被报出的界面上验证。传 `search` 可列出匹配的事件 id。进入的是真实房间，因此层数会推进。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

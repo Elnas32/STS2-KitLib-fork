@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_enter_room`** — Enter a room directly by event id (e.g. `CRYSTAL_SPHERE`) or by room type, instead of walking the map until one comes up, so a bug reported against a specific event can be checked on the surface it was reported on. Pass `search` to list matching event ids. Enters a real room, so the floor advances.
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

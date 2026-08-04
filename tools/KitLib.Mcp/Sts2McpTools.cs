@@ -281,12 +281,17 @@ internal sealed class Sts2McpTools {
         string? search = null,
         CancellationToken cancellationToken = default) {
         var args = new JsonObject();
-        if (search != null)
+        // search is checked FIRST by the bridge and returns before entering anything, so forward it alone
+        // when given -- sending it alongside event_id/room would silently turn entering a room into a lookup.
+        if (search != null) {
             args["search"] = search;
-        if (!string.IsNullOrWhiteSpace(event_id))
-            args["event_id"] = event_id.Trim();
-        if (!string.IsNullOrWhiteSpace(room))
-            args["room"] = room.Trim();
+        }
+        else {
+            if (!string.IsNullOrWhiteSpace(event_id))
+                args["event_id"] = event_id.Trim();
+            if (!string.IsNullOrWhiteSpace(room))
+                args["room"] = room.Trim();
+        }
         return _bridge.CallToolAsync("dev_enter_room", args, cancellationToken);
     }
 }
