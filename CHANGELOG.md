@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dev panel icons** — The MDI icon set is generated as part of the build instead of only by `make icons`, which nothing depended on. `KitLib.Panel` shipped with no icon set at all: the build stayed green while every icon lookup logged `icon '<name>' not found` at runtime. *[@Elnas32](https://github.com/Elnas32) · [PR #13](https://github.com/WRXinYue/STS2-KitLib/pull/13) · [b78a311](https://github.com/WRXinYue/STS2-KitLib/commit/b78a311)*
 ### Added
 
-- **MCP `dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields) by index, so menus and dialogs can be driven without a mouse.
+- **MCP `dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields) by index, so menus and dialogs can be driven without a mouse. Also drives mod-added controls that are not buttons at all and handle their own `gui_input` — rows, panel handles, footer controls.
 
 ## [0.32.1] - 2026-08-01
 

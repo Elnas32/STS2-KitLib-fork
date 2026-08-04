@@ -116,9 +116,10 @@ internal sealed class Sts2McpTools {
         _bridge.CallToolAsync("get_map_state", new JsonObject(), cancellationToken);
 
     [McpServerTool(Name = "dev_ui"), Description(
-        "List and drive on-screen UI controls (buttons, checkboxes, dropdowns, text fields) by index. "
-        + "Use action 'list' first, then click/toggle/select/set_text. This is how menus and dialogs are "
-        + "driven; dev_hover only covers hover-only game surfaces.")]
+        "List and drive on-screen UI controls (buttons, checkboxes, dropdowns, text fields, and mod-added "
+        + "controls that handle their own gui_input) by index. Use action 'list' first, then "
+        + "click/toggle/select/set_text. This is how menus and dialogs are driven; dev_hover only covers "
+        + "hover-only game surfaces.")]
     public Task<string> DevUi(
         [Description("list, click, toggle, select, or set_text.")]
         string action = "list",
