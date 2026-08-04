@@ -29,3 +29,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Mod test — Rest site** — Leaving the preview room restores your solo layout on stable game builds.
 - **Pseudo co-op restart** — Starting pseudo co-op a second time in one session no longer fails to open its host. The ENet host on port 33771 was never released when a run ended, so every later start failed with `CantCreate` until the game was restarted.
+- **Pseudo co-op seed** — Entering a seed no longer aborts "Start pseudo co-op" outright. The seed is applied and synced; only the standard character-select screen refuses the UI notification, and that refusal used to escape and take the whole host start with it.
