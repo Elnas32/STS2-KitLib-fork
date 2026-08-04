@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **MCP `dev_add_relic`** — Grant a relic to the local player by model id, the relic counterpart of `dev_add_card`. Pass `search` to list ids and rarities without a run.
-- **MCP `dev_hover`** — Focus a UI element so hover-only behaviour fires. `target` takes an alias (`map_node`, `reward_alternative`, `rest_option`, `relic`, `boss_icon`, `event_option`, `potion`, `card`, `creature`, `treasure_relic`) or any node type name; `target: "list"` reports every focusable type on screen, `"none"` unhovers, `click` presses after focusing, and omitting `index` lists that target's instances.
+- **MCP `dev_hover`** — Focus a UI element so hover-only behaviour fires. `target` takes an alias (`map_node`, `reward_alternative`, `rest_option`, `relic`, `boss_icon`, `event_option`, `potion`, `card`, `creature`, `treasure_relic`) or any node type name, including plain Godot `Control`s a mod added — those are driven by emitting `mouse_entered`, so mod panels and injected icons are reachable too. `target: "list"` reports every focusable type on screen, `"none"` unhovers, `click` presses after focusing, omitting `index` lists that target's instances tagged `via=focus|signal|none`, and `release_previous: false` stacks a hover so a panel the hover opened can still be read.
 
 ## [0.32.1] - 2026-08-01
 
