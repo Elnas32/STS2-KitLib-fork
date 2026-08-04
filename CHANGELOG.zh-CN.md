@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **伪联机重开** — 同一次游戏进程内第二次开伪联机不再失败。此前对局结束时从不释放 33771 端口上的 ENet host，之后每次开房都以 `CantCreate` 失败，只能重启游戏。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added
