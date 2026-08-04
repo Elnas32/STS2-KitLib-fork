@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **伪联机种子** — 填写种子不再让「开始伪联机」直接失败。种子实际已应用并同步，只是标准选角色界面拒绝该 UI 通知，而这个拒绝此前会一路抛出、把整个开房流程带崩。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

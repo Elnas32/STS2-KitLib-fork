@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Pseudo co-op seed** — Entering a seed no longer aborts "Start pseudo co-op" outright. The seed is applied and synced; only the standard character-select screen refuses the UI notification, and that refusal used to escape and take the whole host start with it.
+
 ## [0.32.1] - 2026-08-01
 
 ### Added
