@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **MCP `dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields) by index, so menus and dialogs can be driven without a mouse. Also drives mod-added controls that are not buttons at all and handle their own `gui_input` — rows, panel handles, footer controls — and has a `focus` action for screens that act on Godot's `FocusEntered` rather than on a press, which is what makes character select reachable.
 - **MCP `dev_read_text`** — Read visible on-screen text (labels, tooltips, panels, forecasts) with BBCode stripped, so an agent can read what a preview or tooltip actually says.
 - **MCP `dev_add_potion`** — Grant a potion to the local player by model id, the potion counterpart of `dev_add_card` and `dev_add_relic`. Pass `search` to list ids without a run.
+- **MCP `dev_hover` reaches mod-added controls** — A node with no `OnFocus()` override is now driven by emitting `mouse_entered`, the same signal Godot raises for a real cursor, so mod panels, their rows, and injected icons are hoverable too. Listed instances are tagged `via=focus|signal|none`, and `release_previous: false` stacks a hover so a panel that the hover opened can still be read.
 
 ### Changed
 
