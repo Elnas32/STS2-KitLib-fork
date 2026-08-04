@@ -46,6 +46,7 @@ Connect any [Model Context Protocol](https://modelcontextprotocol.io) client (Cl
 - **`dev_add_monster`** — Add a monster mid-combat (DevMode enemy panel)
 - **`dev_set_cheat`** — Toggle cheats or set multipliers (`freeze_enemies`, `damage_multiplier`, …)
 - **`dev_set_stat`** — Set gold/energy/HP values or enable stat locks
+- **`dev_jump_floor`** — Move a run forward by `act` (the game's own act transition) and/or `floor`. Floors are synthetic: no rooms entered, no rewards generated, padding lands in a finished act's history when the run is past act 0. Reaches a depth, not a depth by a particular route
 
 Health check: `GET http://127.0.0.1:9877/health`
 :::
@@ -70,6 +71,7 @@ Health check: `GET http://127.0.0.1:9877/health`
 - **`dev_add_monster`** — 战斗中加怪（Dev 敌人面板）
 - **`dev_set_cheat`** — 开关作弊或设倍率（`freeze_enemies`、`damage_multiplier` 等）
 - **`dev_set_stat`** — 设金币/能量/生命或开启数值锁定
+- **`dev_jump_floor`** — 按 `act`（走游戏自身的换章流程）与/或 `floor` 推进对局。层数是合成的：不进入房间、不产生奖励，且在离开第 0 章后填充到已完成章节的历史里。只到达「深度」，不代表走过某条具体路线
 
 健康检查：`GET http://127.0.0.1:9877/health`
 :::

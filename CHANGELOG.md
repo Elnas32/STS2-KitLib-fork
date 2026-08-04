@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_jump_floor`** — Move a run forward by acts (the game's own act transition) and/or floors, so floor-gated behaviour such as the act-3 relic gates can be reached without playing thirty rooms by hand. Floors are synthetic — no rooms are entered and no rewards are generated — so use it where the route taken does not matter to what is being tested.
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

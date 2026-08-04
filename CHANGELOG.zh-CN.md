@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_jump_floor`** — 按章（走游戏自身的换章流程）与/或层数把对局向前推进，无需手动打三十个房间即可触发按层数判定的行为（如第三章遗物的层数门槛）。层数是合成的——不进入任何房间、不产生任何奖励——因此只适合用在「走哪条路线不影响所测内容」的场景。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added
