@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **MCP `dev_read_text`** — Read visible on-screen text (labels, tooltips, panels, forecasts) with BBCode stripped, so an agent can read what a preview or tooltip actually says.
 - **MCP `dev_add_potion`** — Grant a potion to the local player by model id, the potion counterpart of `dev_add_card` and `dev_add_relic`. Pass `search` to list ids without a run.
 - **MCP `dev_hover` reaches mod-added controls** — A node with no `OnFocus()` override is now driven by emitting `mouse_entered`, the same signal Godot raises for a real cursor, so mod panels, their rows, and injected icons are hoverable too. Listed instances are tagged `via=focus|signal|none`, and `release_previous: false` stacks a hover so a panel that the hover opened can still be read.
+- **MCP `dev_jump_floor`** — Move a run forward by acts (the game's own act transition) and/or floors, so floor-gated behaviour such as the act-3 relic gates can be reached without playing thirty rooms by hand. Floors are synthetic — no rooms are entered and no rewards are generated — so use it where the route taken does not matter to what is being tested.
 
 ### Changed
 

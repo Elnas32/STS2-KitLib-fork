@@ -393,11 +393,13 @@ internal sealed class Sts2McpTools {
 
     [McpServerTool(Name = "dev_jump_floor"), Description(
         "Jump a run forward by ACTS (the game's own act transition) and/or FLOORS (synthetic — pads the "
-        + "floor counter without playing rooms, for testing floor-gated behaviour like act-3 relic gates).")]
+        + "floor counter without playing rooms, for testing floor-gated behaviour like act-3 relic gates). "
+        + "Reaches a DEPTH, not a depth by a particular route: use it where the path taken does not matter "
+        + "to what is being tested.")]
     public Task<string> DevJumpFloor(
         [Description("Target act INDEX (0-based). Must be at or ahead of the current act.")]
         int? act = null,
-        [Description("Target TotalFloor. Synthetic: enters no rooms and draws no RNG.")]
+        [Description("Target TotalFloor. Synthetic: enters no rooms and draws no RNG. Padding lands in a finished act's history when the run is past act 0, so the current act's history stays exact; ActFloor moves with it.")]
         int? floor = null,
         CancellationToken cancellationToken = default) {
         var args = new JsonObject();

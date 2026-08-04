@@ -22,6 +22,7 @@
 - **MCP `dev_read_text`** — 读取当前屏幕上的可见文本（标签、提示、面板、预测）并去除 BBCode，令 agent 能读出预览与提示的实际内容。
 - **MCP `dev_add_potion`** — 按 model id 给本地玩家授予药水，相当于 `dev_add_card` / `dev_add_relic` 的药水版。传 `search` 可在无对局时列出 id。
 - **MCP `dev_hover` 支持 mod 添加的控件** — 没有 `OnFocus()` 重写的节点改为发出 `mouse_entered` 信号驱动（与真实鼠标触发的信号相同），因此 mod 面板、面板行与注入的图标同样可以悬停。列出的实例会标注 `via=focus|signal|none`；`release_previous: false` 可叠加悬停，使悬停打开的面板仍能被读取。
+- **MCP `dev_jump_floor`** — 按章（走游戏自身的换章流程）与/或层数把对局向前推进，无需手动打三十个房间即可触发按层数判定的行为（如第三章遗物的层数门槛）。层数是合成的——不进入任何房间、不产生任何奖励——因此只适合用在「走哪条路线不影响所测内容」的场景。
 
 ### Changed
 
