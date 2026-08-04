@@ -41,14 +41,16 @@ internal sealed class GetMapStateTool : IMcpTool {
     public Task<JsonNode> ExecuteAsync(JsonObject args) => Task.FromResult(Run());
 
     static JsonNode Run() {
+        // Fail() rather than a bare {"error": …}: every other bridge tool answers with ok:false plus error,
+        // and a caller branching on ok saw it absent here rather than false.
         var state = RunManager.Instance?.DebugOnlyGetState();
         if (state == null)
-            return new JsonObject { ["error"] = "No active run." };
+            return DevCardMcpHelper.Fail("No active run.");
 
         var map = state.Map;
         var points = map?.GetAllMapPoints()?.ToList();
         if (map == null || points == null || points.Count == 0)
-            return new JsonObject { ["error"] = "No map for the current act." };
+            return DevCardMcpHelper.Fail("No map for the current act.");
 
         // GetAllMapPoints() walks the GRID, and the act's entry node is not in it -- ActMap keeps it as
         // StartingMapPoint. Leave it out and the very first "where can I go from here" lookup fails,
