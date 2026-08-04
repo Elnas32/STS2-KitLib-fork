@@ -16,3 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Dev panel** — AI Host is no longer registered on the KitDevTools side rail; a dedicated KitAI panel will replace it.
 - **Multiplayer harness** — SyncBot lobby/phantom combat patches moved to KitDevTools. KitAI keeps decision loops and calls Core NetPlay APIs to enqueue combat.
+
+### Fixed
+
+- **Pseudo co-op card choices** — A simulated peer playing a card that asks for a choice no longer stalls the fight. The choice was answered but the paused action was never resumed, so that peer's queue stopped draining: it played nothing further and never ended its turn, with the choice UI still on screen. Seen with Silent's Survivor.
