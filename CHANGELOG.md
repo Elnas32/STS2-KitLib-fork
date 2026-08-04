@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **MCP `dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields) by index, so menus and dialogs can be driven without a mouse.
+- **MCP `dev_ui`** — List and drive ordinary UI controls (buttons, checkboxes, dropdowns, text fields) by index, so menus and dialogs can be driven without a mouse. Also drives mod-added controls that are not buttons at all and handle their own `gui_input` — rows, panel handles, footer controls.
 
 ## [0.32.1] - 2026-08-01
 
