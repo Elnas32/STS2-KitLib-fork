@@ -153,6 +153,7 @@ internal sealed class DevHoverTool : IMcpTool {
         _focused.Add((chosen, viaSignal));
 
         var clicked = false;
+        JsonArray? releasedByClick = null;
         if (args.TryGetPropertyValue("click", out var clickNode)
             && clickNode?.GetValueKind() == JsonValueKind.True) {
             if (chosen is not NClickableControl clickable)
@@ -162,7 +163,14 @@ internal sealed class DevHoverTool : IMcpTool {
             // what makes a hover preview comparable against actually committing to it.
             clickable.ForceClick();
             clicked = true;
-            _focused.Clear();   // the node this focused is usually torn down by its own handler
+
+            // Drop ONLY the clicked node, because its own handler usually tears it down and releasing a freed
+            // node is meaningless. Everything it was STACKED on is still alive and still hovered, so the rest
+            // has to be released properly: clearing the whole list instead left those nodes keyed to a tip
+            // nothing would ever clear -- the orphaned-tip leak UnfocusAll exists to prevent -- and a later
+            // target:"none" saw an empty stack and reported nothing to do.
+            _focused.RemoveAt(_focused.Count - 1);
+            releasedByClick = UnfocusAll();
         }
 
         return new JsonObject {
@@ -171,6 +179,7 @@ internal sealed class DevHoverTool : IMcpTool {
             ["index"] = index,
             ["hovered"] = Describe(chosen),
             ["clicked"] = clicked,
+            ["releasedByClick"] = releasedByClick,
             ["count"] = listed.Count,
         };
     }
