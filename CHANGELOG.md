@@ -32,9 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Pseudo co-op companion spawn on v0.110.1** — Registering a simulated peer threw `NullReferenceException` and aborted the spawn part-way, leaving the companion in the run with no action queue, so every card it played was dropped and its turn was force-ended. *[@Elnas32](https://github.com/Elnas32) · [PR #8](https://github.com/WRXinYue/STS2-KitLib/pull/8) · [108b87c](https://github.com/WRXinYue/STS2-KitLib/commit/108b87c)*
 - **Combat ready-set lookup on v0.110.1** — The per-player "ready to begin enemy turn" check always reported `false`, so simulated peers were re-signalled after they were already ready. *[@Elnas32](https://github.com/Elnas32) · [PR #8](https://github.com/WRXinYue/STS2-KitLib/pull/8) · [108b87c](https://github.com/WRXinYue/STS2-KitLib/commit/108b87c)*
 - **Dev panel icons** — The MDI icon set is generated as part of the build instead of only by `make icons`, which nothing depended on. `KitLib.Panel` shipped with no icon set at all: the build stayed green while every icon lookup logged `icon '<name>' not found` at runtime. *[@Elnas32](https://github.com/Elnas32) · [PR #13](https://github.com/WRXinYue/STS2-KitLib/pull/13) · [b78a311](https://github.com/WRXinYue/STS2-KitLib/commit/b78a311)*
-### Added
-
-- **MCP `get_map_state`** — Full act map for route planning: every node with row/col, type and children (edges), plus the visited path, current position, the nodes reachable next, and the boss. Works with the map screen closed.
 
 ## [0.32.1] - 2026-08-01
 
