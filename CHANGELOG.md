@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Cheat rail tabs** — Cards, Cheats, Card Test, and the other in-run cheat sidebar entries are registered by KitDevTools Panel. Core still runs cheat patches and APIs, but no longer lists `devmode.*` cheat tabs.
 - **Product versions** — Sibling products (`KitModPanel`, `KitDevTools`, `KitAI`) now version independently from KitLib (dev builds at **0.0.1**; first release planned as **0.1.0**). Their changelogs live under `mods/<Product>/CHANGELOG.md` (and `.zh-CN.md`). Root changelogs remain KitLib-only.
 
+### Fixed
+
+- **`dev_start_test_run` seed now pins act selection** — the injected seed reaches the lobby's act roll (via `NGame.DebugSeedOverride`, restored after the embark), so a fixed-seed dev run no longer lands in a random act-1 (Overgrowth vs Underdocks) with a different encounter universe each launch.
+
 ## [0.33.0] - 2026-08-06
 
 ### Added

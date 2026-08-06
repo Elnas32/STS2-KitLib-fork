@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **作弊侧栏页签** — Cards、Cheats、Card Test 等局内作弊侧栏入口改由 KitDevTools Panel 注册。Core 仍运行作弊补丁与 API，但不再登记 `devmode.*` 作弊页签。
 - **产品版本** — 兄弟产品（`KitModPanel`、`KitDevTools`、`KitAI`）与 KitLib 独立版本（开发中为 **0.0.1**，首发计划 **0.1.0**）。各自变更见 `mods/<Product>/CHANGELOG.md`（及 `.zh-CN.md`）。根目录 changelog 仅记录 KitLib。
 
+### Fixed
+
+- **`dev_start_test_run` 的种子现在同时锁定章节选择** — 注入的种子会到达大厅的章节掷点（通过 `NGame.DebugSeedOverride`，出发后即恢复原值），固定种子的开发局不再每次随机进入不同的第一章（Overgrowth / Underdocks）及其不同的敌人池。
+
 ## [0.33.0] - 2026-08-06
 
 ### Added
