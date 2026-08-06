@@ -5,6 +5,7 @@ using KitLib.Cheat;
 using KitLib.Presets;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
@@ -109,6 +110,9 @@ public static class SaveProgressPatch {
 /// Intercepts NGame.StartNewSingleplayerRun to inject PendingRestartSeed.
 /// NGame.DebugSeedOverride cannot be used here because NCharacterSelectScreen.BeginRun
 /// overwrites it from its own settings (and clears it) before the run launches.
+/// This is the final authority on the RunRngSet seed and the single point that
+/// CONSUMES PendingRestartSeed; SeedInjectLobbyPatch below runs earlier so the
+/// pre-run lobby rolls (act selection, random characters) use the same seed.
 /// </summary>
 [HarmonyPatch(typeof(NGame), nameof(NGame.StartNewSingleplayerRun))]
 public static class SeedInjectPatch {
@@ -121,5 +125,38 @@ public static class SeedInjectPatch {
 
         // Consumed — clear so a subsequent normal run is not affected.
         KitLibState.PendingRestartSeed = null;
+    }
+}
+
+/// <summary>
+/// Injects PendingRestartSeed one step EARLIER than SeedInjectPatch. The lobby's
+/// BeginRunForAllPlayersIfAllReady computes the embark seed — reading
+/// NGame.DebugSeedOverride FIRST — and BeginRunLocally then rolls ACT SELECTION and
+/// random-character resolution from that seed's "act_selection" stream, all before
+/// StartNewSingleplayerRun ever runs. Without this, a dev run's acts were rolled from
+/// the session's throwaway random seed: the same injected seed landed in Overgrowth on
+/// one run and Underdocks on the next (found 2026-08-06 chasing a bimodal fixed-seed
+/// regression walk — identical map shape, two encounter universes). Going through
+/// DebugSeedOverride also keeps multiplayer consistent: the host broadcasts the seed it
+/// computed here. The override is restored in the Postfix — the method consumes it
+/// synchronously — so an aborted embark can never leak the dev seed into a normal run.
+/// </summary>
+[HarmonyPatch(typeof(StartRunLobby), "BeginRunForAllPlayersIfAllReady")]
+public static class SeedInjectLobbyPatch {
+    public static void Prefix(out (bool Set, string? Prior) __state) {
+        __state = (false, null);
+        if (KitLibState.PendingRestartSeed == null || NGame.Instance == null)
+            return;
+
+        __state = (true, NGame.Instance.DebugSeedOverride);
+        var canonicalized = SeedHelper.CanonicalizeSeed(KitLibState.PendingRestartSeed);
+        NGame.Instance.DebugSeedOverride = canonicalized;
+        KitLog.Info($"SeedInject(lobby): DebugSeedOverride → '{canonicalized}' so act selection rolls on the dev seed.");
+    }
+
+    public static void Postfix((bool Set, string? Prior) __state) {
+        if (!__state.Set || NGame.Instance == null)
+            return;
+        NGame.Instance.DebugSeedOverride = __state.Prior;
     }
 }

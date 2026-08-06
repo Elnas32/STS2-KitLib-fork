@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`dev_start_test_run` seed now pins act selection** — the injected seed reaches the lobby's act roll (via `NGame.DebugSeedOverride`, restored after the embark), so a fixed-seed dev run no longer lands in a random act-1 (Overgrowth vs Underdocks) with a different encounter universe each launch.
+
 ## [0.32.1] - 2026-08-01
 
 ### Added

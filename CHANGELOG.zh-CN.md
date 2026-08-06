@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`dev_start_test_run` 的种子现在同时锁定章节选择** — 注入的种子会到达大厅的章节掷点（通过 `NGame.DebugSeedOverride`，出发后即恢复原值），固定种子的开发局不再每次随机进入不同的第一章（Overgrowth / Underdocks）及其不同的敌人池。
+
 ## [0.32.1] - 2026-08-01
 
 ### Added
