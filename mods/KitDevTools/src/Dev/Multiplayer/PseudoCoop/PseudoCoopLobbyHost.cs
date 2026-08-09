@@ -40,6 +40,14 @@ internal static class PseudoCoopLobbyHost {
         public bool SyncBotAutoEndTurn { get; init; } = true;
         public bool MpAiTeammateEnabled { get; init; } = true;
         public bool AutoPresetOnLaunch { get; init; }
+
+        /// <summary>Ascension for the run, or null to keep whatever character select last used. Clamped to
+        /// what the lobby allows.</summary>
+        public int? Ascension { get; init; }
+
+        /// <summary>Run modifiers, or null for none. Standard multiplayer embark has no modifier UI, so
+        /// these are applied by <see cref="Patches.PseudoCoopRunModifiersPatch"/>.</summary>
+        public IReadOnlyList<ModifierModel>? Modifiers { get; init; }
     }
 
     public static Task<(bool ok, string error)> TryStartAsync(LaunchOptions options) {
@@ -88,6 +96,8 @@ internal static class PseudoCoopLobbyHost {
             var lobby = charSelect.Lobby;
             lobby.SetLocalCharacter(options.Character);
             TrySetSeed(lobby, options.Seed);
+            TrySetAscension(lobby, options.Ascension);
+            PseudoCoopRunModifiers.Request(options.Modifiers);
 
             // Do not Push char select onto the main-menu stack: SetCurrentScene frees the menu
             // while StartNewMultiplayerRun is still running, which can tear down the embark flow.
@@ -154,6 +164,35 @@ internal static class PseudoCoopLobbyHost {
 
         if (lobby.Seed != trimmed)
             KitLog.Warn("PseudoCoop", $"Seed '{trimmed}' was not applied (lobby seed is '{lobby.Seed}').");
+    }
+
+    /// <summary>
+    /// Applies the requested ascension through the lobby's own host-side setter, clamped to what the lobby
+    /// allows.
+    /// </summary>
+    /// <remarks>
+    /// Ascension is NOT carried over from anything: standard multiplayer embark reads
+    /// <c>StartRunLobby.Ascension</c>, which for a host lobby is whatever the character-select ascension
+    /// panel last had. Null therefore keeps that behaviour, which is what the launcher UI wants; a caller
+    /// restarting an existing run passes the level it was playing at.
+    ///
+    /// <c>MaxAscension</c> is the minimum unlocked across the lobby's players, so asking for more than that
+    /// is clamped rather than refused - the run still starts, and the log says what happened. Unlike
+    /// <c>SetSeed</c> and <c>SetModifiers</c>, the listener callback here is real (it just moves the panel),
+    /// so this needs no swallowed <c>NotImplementedException</c>.
+    /// </remarks>
+    static void TrySetAscension(StartRunLobby lobby, int? ascension) {
+        if (ascension is not int requested) return;
+
+        var applied = Math.Clamp(requested, 0, lobby.MaxAscension);
+        if (applied != requested)
+            KitLog.Warn("PseudoCoop",
+                $"Ascension {requested} is above the lobby maximum; starting at {applied} instead.");
+
+        if (applied == lobby.Ascension) return;
+
+        lobby.SyncAscensionChange(applied);
+        KitLog.Info("PseudoCoop", $"Ascension set to {applied}.");
     }
 
     static void ApplySettings(LaunchOptions options) {
