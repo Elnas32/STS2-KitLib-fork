@@ -88,6 +88,17 @@ internal static class DevMainMenuPseudoCoopUI {
         seedRow.AddChild(seedEdit);
         vbox.AddChild(seedRow);
 
+        // Empty keeps character select's own ascension, which is what this launcher always used.
+        var ascensionRow = new HBoxContainer();
+        ascensionRow.AddThemeConstantOverride("separation", 8);
+        ascensionRow.AddChild(CreateFieldLabel(I18N.T("devmenu.pseudocoop.ascension", "Ascension")));
+        var ascensionEdit = new LineEdit {
+            PlaceholderText = I18N.T("devmenu.pseudocoop.ascensionPlaceholder", "Character select's level if empty"),
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+        };
+        ascensionRow.AddChild(ascensionEdit);
+        vbox.AddChild(ascensionRow);
+
         vbox.AddChild(Separator());
 
         var chkSyncBot = CreateCheckBox(
@@ -189,6 +200,20 @@ internal static class DevMainMenuPseudoCoopUI {
                 phantomCharacter = Characters[phantomIdx];
             }
 
+            int? ascension = null;
+            var ascensionText = ascensionEdit.Text?.Trim() ?? string.Empty;
+            if (ascensionText.Length > 0) {
+                if (!int.TryParse(ascensionText, out var parsed) || parsed < 0) {
+                    errorLbl.Text = I18N.T("devmenu.pseudocoop.badAscension", "Ascension must be a number, 0 or more.");
+                    errorLbl.Visible = true;
+                    statusLbl.Visible = false;
+                    startBtn.Disabled = false;
+                    cancelBtn.Disabled = false;
+                    return;
+                }
+                ascension = parsed;
+            }
+
             var options = new PseudoCoopLobbyHost.LaunchOptions {
                 Character = Characters[idx],
                 PhantomCharacter = phantomCharacter,
@@ -198,6 +223,7 @@ internal static class DevMainMenuPseudoCoopUI {
                 SyncBotAutoEndTurn = chkAutoEndTurn.ButtonPressed,
                 MpAiTeammateEnabled = chkTeammate.ButtonPressed,
                 AutoPresetOnLaunch = chkAutoPresetLaunch.ButtonPressed,
+                Ascension = ascension,
             };
 
             _ = StartAsync(overlay, onBeforeLaunch, options, statusLbl, errorLbl, startBtn, cancelBtn);
