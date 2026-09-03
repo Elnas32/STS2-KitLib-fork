@@ -153,6 +153,10 @@ internal sealed class DevMouseTool : IMcpTool {
                 return DevCardMcpHelper.Fail($"Unknown action '{action}'. Use move, click, press, release, scroll, or where.");
         }
 
+        // The GUI's notion of what is under the cursor settles one frame after the motion is dispatched,
+        // so read it a frame later or the report names what was hovered BEFORE the move.
+        await tree.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
+
         var response = new JsonObject {
             ["ok"] = true,
             ["action"] = action,
