@@ -336,6 +336,7 @@ internal sealed class DevUiTool : IMcpTool {
             ["type"] = control.GetType().Name,
             ["label"] = Label(control),
             ["name"] = control.Name.ToString(),
+            ["rect"] = UiGeometry.Rect(control),
         };
 
         if (control is BaseButton button) {

@@ -169,6 +169,81 @@ internal sealed class Sts2McpTools {
         return _bridge.CallToolAsync("dev_read_text", args, cancellationToken);
     }
 
+    [McpServerTool(Name = "dev_screenshot"), Description(
+        "Save a PNG of the current game frame and return its path. Optionally crop to one node (node_type + "
+        + "index) with padding. Use it for layout claims (overlap, wrapping, clamping) that dev_read_text cannot "
+        + "express; rects from dev_ui / dev_read_text are canvas units, multiply by the returned scale for pixels.")]
+    public Task<string> DevScreenshot(
+        [Description("Where to write the PNG. Default: timestamped file under the system temp folder.")]
+        string? path = null,
+        [Description("Crop to a visible node of this type name (e.g. NRelicInventoryHolder, PanelContainer).")]
+        string? node_type = null,
+        [Description("Which node of that type, tree order, visible only (default 0).")]
+        int index = 0,
+        [Description("Extra canvas units around the cropped node (default 40).")]
+        int padding = 40,
+        [Description("Downscale so the image is at most this wide; 0 keeps full size (default 0).")]
+        int max_width = 0,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject {
+            ["index"] = index,
+            ["padding"] = padding,
+            ["max_width"] = max_width,
+        };
+        if (!string.IsNullOrWhiteSpace(path))
+            args["path"] = path;
+        if (!string.IsNullOrWhiteSpace(node_type))
+            args["node_type"] = node_type;
+        return _bridge.CallToolAsync("dev_screenshot", args, cancellationToken);
+    }
+
+    [McpServerTool(Name = "dev_mouse"), Description(
+        "Drive the REAL mouse through the engine's input pipeline: move / click / press / release / scroll at "
+        + "canvas coordinates (the units dev_ui and dev_read_text rects use) or at the centre of a node "
+        + "(node_type + index). Fires mouse_entered/exited and gui_input by geometry and moves the OS cursor, "
+        + "so cursor-polling panels behave as for a person. Returns which Control the engine considers hovered. "
+        + "Use dev_hover / dev_ui to address a node directly; use this when WHERE it is drawn matters. "
+        + "Action 'where' only reports the cursor and hovered control.")]
+    public Task<string> DevMouse(
+        [Description("move, click, press, release, scroll, or where (default move).")]
+        string action = "move",
+        [Description("Canvas X (ignored when node_type is given).")]
+        double? x = null,
+        [Description("Canvas Y (ignored when node_type is given).")]
+        double? y = null,
+        [Description("Target the centre of a visible node of this type name instead of x/y.")]
+        string? node_type = null,
+        [Description("Which node of that type, tree order, visible only (default 0).")]
+        int index = 0,
+        [Description("Offset from the node centre, canvas units.")]
+        double dx = 0,
+        [Description("Offset from the node centre, canvas units.")]
+        double dy = 0,
+        [Description("left, right or middle (default left).")]
+        string button = "left",
+        [Description("For scroll: wheel notches, positive = up (default 1).")]
+        int amount = 1,
+        [Description("Bring the game window to the front before warping the OS cursor (default true).")]
+        bool focus_window = true,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject {
+            ["action"] = action,
+            ["index"] = index,
+            ["dx"] = dx,
+            ["dy"] = dy,
+            ["button"] = button,
+            ["amount"] = amount,
+            ["focus_window"] = focus_window,
+        };
+        if (x.HasValue)
+            args["x"] = x.Value;
+        if (y.HasValue)
+            args["y"] = y.Value;
+        if (!string.IsNullOrWhiteSpace(node_type))
+            args["node_type"] = node_type;
+        return _bridge.CallToolAsync("dev_mouse", args, cancellationToken);
+    }
+
     [McpServerTool(Name = "dev_add_potion"), Description(
         "Grant a potion to the local player by model id. Pass 'search' instead to look an id up.")]
     public Task<string> DevAddPotion(

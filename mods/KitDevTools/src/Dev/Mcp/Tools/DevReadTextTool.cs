@@ -95,6 +95,7 @@ internal sealed class DevReadTextTool : IMcpTool {
                 ["type"] = control.GetType().Name,
                 ["name"] = control.Name.ToString(),
                 ["plain"] = plain,
+                ["rect"] = UiGeometry.Rect(control),
             };
             // Only carry the raw string when the markup actually differs, so a response full of
             // unmarked labels stays readable.
