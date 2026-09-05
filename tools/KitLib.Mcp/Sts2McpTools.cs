@@ -359,6 +359,67 @@ internal sealed class Sts2McpTools {
         return _bridge.CallToolAsync("dev_remove_card", args, cancellationToken);
     }
 
+    [McpServerTool(Name = "dev_set_unknown_odds"), Description(
+        "Set the CURRENT odds of one room type for the run's '?' map-point roll (Monster, Elite, Treasure, Shop; "
+        + "Event is the remainder). Treasure=1 with Monster=0 makes the next '?' a chest. reset=true restores "
+        + "every current value to its base. Returns all four current odds.")]
+    public Task<string> DevSetUnknownOdds(
+        [Description("Monster, Elite, Treasure or Shop.")]
+        string? room_type = null,
+        [Description("New current odds for that type, 0..1 (negative disables the type).")]
+        double? odds = null,
+        [Description("Restore every current value to its base instead of setting one.")]
+        bool reset = false,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject();
+        if (reset)
+            args["reset"] = true;
+        if (!string.IsNullOrWhiteSpace(room_type))
+            args["room_type"] = room_type.Trim();
+        if (odds is { } value)
+            args["odds"] = value;
+        return _bridge.CallToolAsync("dev_set_unknown_odds", args, cancellationToken);
+    }
+
+    [McpServerTool(Name = "dev_force_next_event"), Description(
+        "Make a chosen event the next one the current act hands out (moves the act's event-ring pointer forward "
+        + "to it). list=true shows the ring, its pointer and each entry's allowed/visited state instead.")]
+    public Task<string> DevForceNextEvent(
+        [Description("Event model id, e.g. TRASH_HEAP, WELCOME_TO_WONGOS, TABLET_OF_TRUTH (case-insensitive).")]
+        string? event_id = null,
+        [Description("List the act's event ring instead of forcing.")]
+        bool list = false,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject();
+        if (list)
+            args["list"] = true;
+        else if (!string.IsNullOrWhiteSpace(event_id))
+            args["event_id"] = event_id.Trim();
+        return _bridge.CallToolAsync("dev_force_next_event", args, cancellationToken);
+    }
+
+    [McpServerTool(Name = "dev_melt_relic"), Description(
+        "Melt one of the local player's relics by model id (the game's own RelicCmd.Melt, as Toy Box does): it "
+        + "stays in the inventory but no hook fires for it.")]
+    public Task<string> DevMeltRelic(
+        [Description("Model id of an OWNED relic, e.g. PRAYER_WHEEL.")]
+        string relic_id,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject { ["relic_id"] = relic_id.Trim() };
+        return _bridge.CallToolAsync("dev_melt_relic", args, cancellationToken);
+    }
+
+    [McpServerTool(Name = "dev_set_unlock_runs"), Description(
+        "Override the run's UnlockState.NumberOfRuns (0 = the first-ever-run tutorial paths). Run-local; the "
+        + "global progress count is derived and untouched. Returns the previous value so it can be restored.")]
+    public Task<string> DevSetUnlockRuns(
+        [Description("The value to write, 0 or more.")]
+        int runs,
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject { ["runs"] = runs };
+        return _bridge.CallToolAsync("dev_set_unlock_runs", args, cancellationToken);
+    }
+
     [McpServerTool(Name = "dev_add_relic"), Description(
         "Grant a relic to the local player by model id (DevMode relic browser API). "
         + "Pass 'search' instead to look an id up.")]

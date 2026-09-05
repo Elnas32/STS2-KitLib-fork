@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_set_unknown_odds`** — Set the CURRENT odds of one room type for the run's `?` map-point roll (Monster / Elite / Treasure / Shop; Event is the remainder), or `reset` them to base. `Treasure=1` with `Monster=0` makes the next `?` a chest, so a "the next ? is a treasure" scenario is a call instead of a seed hunt; a mod forecasting the `?` queue reads the same odds.
+- **MCP `dev_force_next_event`** — Move the act's event-ring pointer forward to a chosen event so the game's own pull hands it out next; `list` shows the ring with each entry's allowed/visited state. Reaching a specific event no longer needs a seed hunt.
+- **MCP `dev_melt_relic`** — Melt an owned relic through the game's `RelicCmd.Melt` (what Toy Box's wax does): it stays in the inventory but no hook fires for it.
+- **MCP `dev_set_unlock_runs`** — Override the run's `UnlockState.NumberOfRuns` (0 = the first-ever-run tutorial paths: scripted first rewards, forced `?` rolls, Gorget from the first chest). Run-local; the global progress count is derived and untouched. Returns the previous value.
+
 ### Changed
 
 - **NetPlay APIs** — Core owns host combat enqueue, action-queue repair, and SyncBot MpCheat ACKs. KitAI calls these instead of owning the multiplayer test harness.
