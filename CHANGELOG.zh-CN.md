@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_set_unknown_odds`** — 设置本局 `?` 地图节点判定中某一房间类型的当前概率（Monster / Elite / Treasure / Shop，Event 为余量），或用 `reset` 恢复基础值。`Treasure=1` 且 `Monster=0` 时下一个 `?` 必定是宝箱，不再需要反复换种子。
+- **MCP `dev_force_next_event`** — 把当前章节事件环的指针前移到指定事件，让游戏自己的抽取下次交出它；`list` 列出事件环及每项的允许/已访问状态。
+- **MCP `dev_melt_relic`** — 通过游戏自身的 `RelicCmd.Melt`（玩具箱蜡的效果）熔化一件已拥有的遗物：仍在背包里，但不再触发任何钩子。
+- **MCP `dev_set_unlock_runs`** — 覆盖本局的 `UnlockState.NumberOfRuns`（0 = 首次游玩的教程路径：固定首战奖励、强制的 `?` 判定、首个宝箱给 Gorget）。仅影响本局，全局进度计数为派生值不受影响；返回旧值以便恢复。
+
 ### Changed
 
 - **NetPlay API** — 主机战斗入队、action queue 补齐、以及 SyncBot 的 MpCheat ACK 改由 Core 提供。KitAI 只调用这些 API，不再承载联机测试驾驶。
