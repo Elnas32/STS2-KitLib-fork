@@ -58,11 +58,19 @@ internal sealed class DevMeltRelicTool : IMcpTool {
         if (relic.IsMelted)
             return DevCardMcpHelper.Fail($"{relic.Id.Entry} is already melted.");
 
+        // Only WAX melts (Player.MeltRelicInternal throws otherwise), and the game makes wax exactly one way:
+        // Toy Box flags its copies IsWax before handing them over (ToyBox.cs:93). Flag the relic the same
+        // way first, so an ordinary relic reaches the same state a melted Toy Box copy has.
+        bool wasWax = relic.IsWax;
+        if (!wasWax)
+            relic.IsWax = true;
+
         await RelicCmd.Melt(relic);
         return new JsonObject {
             ["ok"] = true,
             ["relicId"] = relic.Id.Entry,
             ["melted"] = relic.IsMelted,
+            ["wasWax"] = wasWax,
         };
     }
 }
