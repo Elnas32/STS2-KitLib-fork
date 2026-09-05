@@ -413,10 +413,20 @@ internal sealed class Sts2McpTools {
         "Override the run's UnlockState.NumberOfRuns (0 = the first-ever-run tutorial paths). Run-local; the "
         + "global progress count is derived and untouched. Returns the previous value so it can be restored.")]
     public Task<string> DevSetUnlockRuns(
-        [Description("The value to write, 0 or more.")]
-        int runs,
+        [Description("NumberOfRuns to write, 0 or more.")]
+        int? runs = null,
+        [Description("Also empty the run's unlocked-epoch set (the tutorial reward script needs zero runs AND zero epochs); the removed ids come back as 'epochs'.")]
+        bool clear_epochs = false,
+        [Description("Epoch ids to put back (what a previous clear_epochs returned).")]
+        string[]? epoch_ids = null,
         CancellationToken cancellationToken = default) {
-        var args = new JsonObject { ["runs"] = runs };
+        var args = new JsonObject();
+        if (runs is { } value)
+            args["runs"] = value;
+        if (clear_epochs)
+            args["clear_epochs"] = true;
+        if (epoch_ids is { Length: > 0 })
+            args["epoch_ids"] = new JsonArray(epoch_ids.Select(id => (JsonNode)id).ToArray());
         return _bridge.CallToolAsync("dev_set_unlock_runs", args, cancellationToken);
     }
 
