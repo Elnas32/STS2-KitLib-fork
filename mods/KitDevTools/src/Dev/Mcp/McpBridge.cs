@@ -67,6 +67,7 @@ internal static class McpBridge {
         Tools.Register(new DevForceNextEventTool());
         Tools.Register(new DevMeltRelicTool());
         Tools.Register(new DevSetUnlockRunsTool());
+        Tools.Register(new DevMpCheatsTool());
 
         try {
             _cts = new CancellationTokenSource();
