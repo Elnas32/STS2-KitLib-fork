@@ -430,6 +430,19 @@ internal sealed class Sts2McpTools {
         return _bridge.CallToolAsync("dev_set_unlock_runs", args, cancellationToken);
     }
 
+    [McpServerTool(Name = "dev_mp_cheats"), Description(
+        "Multiplayer (pseudo co-op) cheats: status reports opt-in / armed / active / host / run mode; enable turns "
+        + "the multiplayer cheat opt-in and NormalRunMode=Cheat on (persisted KitLib settings, previous values "
+        + "returned) and arms the session for the current run; disable restores them; kill_all kills every enemy "
+        + "through host combat sync, the only path that works in a multiplayer fight.")]
+    public Task<string> DevMpCheats(
+        [Description("status (default), enable, disable or kill_all.")]
+        string action = "status",
+        CancellationToken cancellationToken = default) {
+        var args = new JsonObject { ["action"] = action };
+        return _bridge.CallToolAsync("dev_mp_cheats", args, cancellationToken);
+    }
+
     [McpServerTool(Name = "dev_add_relic"), Description(
         "Grant a relic to the local player by model id (DevMode relic browser API). "
         + "Pass 'search' instead to look an id up.")]

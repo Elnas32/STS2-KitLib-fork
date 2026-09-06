@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **MCP `dev_force_next_event`** — Move the act's event-ring pointer forward to a chosen event so the game's own pull hands it out next; `list` shows the ring with each entry's allowed/visited state. Reaching a specific event no longer needs a seed hunt.
 - **MCP `dev_melt_relic`** — Melt an owned relic through the game's `RelicCmd.Melt` (what Toy Box's wax does): it stays in the inventory but no hook fires for it.
 - **MCP `dev_set_unlock_runs`** — Override the run's `UnlockState.NumberOfRuns` (0 = the first-ever-run tutorial paths: scripted first rewards, forced `?` rolls, Gorget from the first chest), and with `clear_epochs` empty its unlocked-epoch set too (the scripted rewards need both). Run-local; the global progress count is derived and untouched. Returns the previous value and the removed epoch ids, which `epoch_ids` puts back.
+- **MCP `dev_mp_cheats`** — Multiplayer (pseudo co-op) cheats over the bridge: `status` reports opt-in / armed / active / host / run mode; `enable` turns the multiplayer cheat opt-in and `NormalRunMode=Cheat` on (persisted settings, previous values returned) and arms the session for the current run; `disable` restores them; `kill_all` kills every enemy through host combat sync — the only path that works in a multiplayer fight, where the local cheat silently refuses.
 
 ### Changed
 
