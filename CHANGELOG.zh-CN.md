@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_start_test_run` 新增 `modifiers` / `ascension`** — 以指定的局内修正（`VINTAGE`、`MIDAS`、`DRAFT`、`CURSED_RUN` 等，自定义局界面的那一套，按 id）和指定进阶等级开始开发测试局。二者会被换入单人开局调用；角色选择界面原本总是以无修正和大厅当前的进阶等级开局。
+- **MCP `dev_set_unknown_odds`** — 设置本局 `?` 地图节点判定中某一房间类型的当前概率（Monster / Elite / Treasure / Shop，Event 为余量），或用 `reset` 恢复基础值。`Treasure=1` 且 `Monster=0` 时下一个 `?` 必定是宝箱，不再需要反复换种子。
+- **MCP `dev_force_next_event`** — 把当前章节事件环的指针前移到指定事件，让游戏自己的抽取下次交出它；`list` 列出事件环及每项的允许/已访问状态。
+- **MCP `dev_melt_relic`** — 通过游戏自身的 `RelicCmd.Melt`（玩具箱蜡的效果）熔化一件已拥有的遗物：仍在背包里，但不再触发任何钩子。
+- **MCP `dev_set_unlock_runs`** — 覆盖本局的 `UnlockState.NumberOfRuns`（0 = 首次游玩的教程路径：固定首战奖励、强制的 `?` 判定、首个宝箱给 Gorget），`clear_epochs` 可一并清空本局已解锁的纪元集合（固定首战奖励同时要求二者为零）。仅影响本局，全局进度计数为派生值不受影响；返回旧值与被移除的纪元 id，`epoch_ids` 可放回。
+- **MCP `dev_mp_cheats`** — 通过桥接使用联机（伪合作）作弊：`status` 报告 opt-in / 已武装 / 生效 / 主机 / 运行模式；`enable` 打开联机作弊 opt-in 与 `NormalRunMode=Cheat`（持久化设置，返回旧值）并为当前局武装会话；`disable` 恢复；`kill_all` 经主机战斗同步击杀全部敌人——联机战斗中唯一有效的路径，本地作弊会静默拒绝。
+
 ### Changed
 
 - **NetPlay API** — 主机战斗入队、action queue 补齐、以及 SyncBot 的 MpCheat ACK 改由 Core 提供。KitAI 只调用这些 API，不再承载联机测试驾驶。

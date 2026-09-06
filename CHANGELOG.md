@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP `dev_start_test_run` `modifiers` / `ascension`** — Start a dev test run with run modifiers (`VINTAGE`, `MIDAS`, `DRAFT`, `CURSED_RUN`, … — the custom-run screen's set, by id) and at a chosen ascension. Both are swapped into the single-player embark, which the character-select screen otherwise starts with no modifiers and the lobby's ascension; a modifier-dependent prediction (Vintage's relic-for-cards swap) is now a call instead of a Custom Run played by hand.
+- **MCP `dev_set_unknown_odds`** — Set the CURRENT odds of one room type for the run's `?` map-point roll (Monster / Elite / Treasure / Shop; Event is the remainder), or `reset` them to base. `Treasure=1` with `Monster=0` makes the next `?` a chest, so a "the next ? is a treasure" scenario is a call instead of a seed hunt; a mod forecasting the `?` queue reads the same odds.
+- **MCP `dev_force_next_event`** — Move the act's event-ring pointer forward to a chosen event so the game's own pull hands it out next; `list` shows the ring with each entry's allowed/visited state. Reaching a specific event no longer needs a seed hunt.
+- **MCP `dev_melt_relic`** — Melt an owned relic through the game's `RelicCmd.Melt` (what Toy Box's wax does): it stays in the inventory but no hook fires for it.
+- **MCP `dev_set_unlock_runs`** — Override the run's `UnlockState.NumberOfRuns` (0 = the first-ever-run tutorial paths: scripted first rewards, forced `?` rolls, Gorget from the first chest), and with `clear_epochs` empty its unlocked-epoch set too (the scripted rewards need both). Run-local; the global progress count is derived and untouched. Returns the previous value and the removed epoch ids, which `epoch_ids` puts back.
+- **MCP `dev_mp_cheats`** — Multiplayer (pseudo co-op) cheats over the bridge: `status` reports opt-in / armed / active / host / run mode; `enable` turns the multiplayer cheat opt-in and `NormalRunMode=Cheat` on (persisted settings, previous values returned) and arms the session for the current run; `disable` restores them; `kill_all` kills every enemy through host combat sync — the only path that works in a multiplayer fight, where the local cheat silently refuses.
+
 ### Changed
 
 - **NetPlay APIs** — Core owns host combat enqueue, action-queue repair, and SyncBot MpCheat ACKs. KitAI calls these instead of owning the multiplayer test harness.

@@ -153,6 +153,10 @@ public static class KitLibState {
     /// <summary>Injected via StartNewSingleplayerRun; char select overwrites/clears DebugSeedOverride.</summary>
     public static string? PendingRestartSeed { get; set; }
 
+    /// <summary>Ascension the next dev test run starts at (<c>dev_start_test_run</c>); the Dev module's launch
+    /// patch swaps it into <c>StartNewSingleplayerRun</c> and clears it.</summary>
+    public static int? PendingRestartAscension { get; set; }
+
     // ── Enemy overrides ──
 
     public static EnemyMode EnemyMode { get; set; } = EnemyMode.Off;
@@ -263,6 +267,7 @@ public static class KitLibState {
     public static void ClearPendingRestart() {
         PendingRestartGold = null;
         PendingRestartSeed = null;
+        PendingRestartAscension = null;
         AutoProceedToCharSelect = false;
     }
 

@@ -142,14 +142,22 @@ internal sealed class Sts2McpTools {
         }, cancellationToken);
 
     [McpServerTool(Name = "dev_start_test_run"), Description(
-        "Start a new DevMode test run from the main menu (opens character select). Optional seed.")]
+        "Start a new DevMode test run from the main menu (opens character select). Optional seed, run modifiers and ascension.")]
     public Task<string> DevStartTestRun(
         [Description("Optional run seed override.")]
         string? seed = null,
+        [Description("Optional run modifier ids (e.g. VINTAGE, MIDAS, DRAFT, CURSED_RUN), case-insensitive; an unknown id fails and lists the valid ones.")]
+        string[]? modifiers = null,
+        [Description("Optional ascension level (0 or more); omitted keeps the lobby's current setting.")]
+        int? ascension = null,
         CancellationToken cancellationToken = default) {
         var args = new JsonObject();
         if (!string.IsNullOrWhiteSpace(seed))
             args["seed"] = seed.Trim();
+        if (modifiers is { Length: > 0 })
+            args["modifiers"] = new JsonArray(modifiers.Select(id => (JsonNode)id).ToArray());
+        if (ascension.HasValue)
+            args["ascension"] = ascension.Value;
         return _bridge.CallToolAsync("dev_start_test_run", args, cancellationToken);
     }
 
