@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **MCP `dev_start_test_run` 新增 `modifiers` / `ascension`** — 以指定的局内修正（`VINTAGE`、`MIDAS`、`DRAFT`、`CURSED_RUN` 等，自定义局界面的那一套，按 id）和指定进阶等级开始开发测试局。二者会被换入单人开局调用；角色选择界面原本总是以无修正和大厅当前的进阶等级开局。
 - **MCP `dev_set_unknown_odds`** — 设置本局 `?` 地图节点判定中某一房间类型的当前概率（Monster / Elite / Treasure / Shop，Event 为余量），或用 `reset` 恢复基础值。`Treasure=1` 且 `Monster=0` 时下一个 `?` 必定是宝箱，不再需要反复换种子。
 - **MCP `dev_force_next_event`** — 把当前章节事件环的指针前移到指定事件，让游戏自己的抽取下次交出它；`list` 列出事件环及每项的允许/已访问状态。
 - **MCP `dev_melt_relic`** — 通过游戏自身的 `RelicCmd.Melt`（玩具箱蜡的效果）熔化一件已拥有的遗物：仍在背包里，但不再触发任何钩子。

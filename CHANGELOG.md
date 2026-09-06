@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **MCP `dev_start_test_run` `modifiers` / `ascension`** — Start a dev test run with run modifiers (`VINTAGE`, `MIDAS`, `DRAFT`, `CURSED_RUN`, … — the custom-run screen's set, by id) and at a chosen ascension. Both are swapped into the single-player embark, which the character-select screen otherwise starts with no modifiers and the lobby's ascension; a modifier-dependent prediction (Vintage's relic-for-cards swap) is now a call instead of a Custom Run played by hand.
 - **MCP `dev_set_unknown_odds`** — Set the CURRENT odds of one room type for the run's `?` map-point roll (Monster / Elite / Treasure / Shop; Event is the remainder), or `reset` them to base. `Treasure=1` with `Monster=0` makes the next `?` a chest, so a "the next ? is a treasure" scenario is a call instead of a seed hunt; a mod forecasting the `?` queue reads the same odds.
 - **MCP `dev_force_next_event`** — Move the act's event-ring pointer forward to a chosen event so the game's own pull hands it out next; `list` shows the ring with each entry's allowed/visited state. Reaching a specific event no longer needs a seed hunt.
 - **MCP `dev_melt_relic`** — Melt an owned relic through the game's `RelicCmd.Melt` (what Toy Box's wax does): it stays in the inventory but no hook fires for it.
