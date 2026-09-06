@@ -91,6 +91,14 @@ internal sealed class DevMpCheatsTool : IMcpTool {
             case "kill_all": {
                 if (!MpCheatSession.InMultiplayerRun)
                     return DevCardMcpHelper.Fail("Not a multiplayer run — use dev_set_cheat kill_all.");
+
+                // Pseudo co-op arms the session at map finish but DEFERS the host's config publish, so the
+                // session sits armed-but-inactive until something publishes. Do what enable does in-run.
+                if (MpCheatSession.SessionArmed && !MpCheatState.IsActive) {
+                    MpCheatState.ApplyOptimisticFromKitLibState();
+                    MpCheatSync.HostPublishFromKitLibState("mcp_kill_all");
+                }
+
                 if (!MpCheatSession.CanUseMultiplayerCheats)
                     return DevCardMcpHelper.Fail($"Multiplayer cheats are not active (armed={MpCheatSession.SessionArmed}, "
                         + $"active={MpCheatState.IsActive}, block={MpCheatSession.LastBlockReason ?? "-"}) — run enable first.");
